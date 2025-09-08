@@ -261,18 +261,20 @@ class GitHubLanguageAnalyzer:
         # Generate markdown
         md = []
         md.append("## 🚀 Tech Stack")
+        md.append("")
         
         # Define section order and titles
         section_titles = {
-            "Primary Technologies": "🌟 Primary Technologies 🌟",
-            "Additional Technologies": "🛠️ Additional Technologies",
-            "Data & Analytics": "📊 Data & Analytics"
+            "Primary Technologies": "### ⭐ Primary Technologies",
+            "Additional Technologies": "### 🛠️ Additional Technologies", 
+            "Data & Analytics": "### 📊 Data & Analytics"
         }
         
         for category_name, techs in categories.items():
             if techs:  # Only show categories that have technologies
-                section_title = section_titles.get(category_name, f"🌟 {category_name} 🌟")
-                md.append(f"\n### {section_title}")
+                section_title = section_titles.get(category_name, f"### 🌟 {category_name}")
+                md.append(section_title)
+                md.append("")
                 
                 # Add subsection for FrontEnd Development in Additional Technologies
                 if category_name == "Additional Technologies":
@@ -280,10 +282,15 @@ class GitHubLanguageAnalyzer:
                     other_techs = [t for t in techs if t["language"] not in ["TypeScript", "Vue", "CSS", "SCSS"]]
                     
                     if frontend_techs:
-                        md.append("**🌐 FrontEnd Development**")
+                        md.append("#### 🌐 Frontend Development")
+                        md.append("")
                         for tech in frontend_techs:
                             self._format_tech_display(tech, md)
-                        md.append("")  # Add spacing between subsections
+                        
+                        # Add a divider between subsections
+                        if other_techs:
+                            md.append("---")
+                            md.append("")
                     
                     # Display other technologies normally
                     for tech in other_techs:
@@ -291,6 +298,9 @@ class GitHubLanguageAnalyzer:
                 else:
                     for tech in techs:
                         self._format_tech_display(tech, md)
+                
+                # Add spacing between major sections
+                md.append("")
         
         return "\n".join(md)
     
@@ -300,7 +310,9 @@ class GitHubLanguageAnalyzer:
         icon = tech["icon"]
         frameworks = tech["frameworks"]
         
-        md.append(f"{icon} **{language}**")
+        # Create a more structured display with better markdown formatting
+        md.append(f"**{icon} {language}**")
+        md.append("")
         
         if frameworks:
             # Organize frameworks by categories for better display
@@ -310,37 +322,37 @@ class GitHubLanguageAnalyzer:
                 ui_frameworks = [f for f in frameworks if f in ["GPUI"]]
                 
                 if web_frameworks:
-                    md.append(f"   🌐 Web Frameworks: {', '.join(web_frameworks)}")
+                    md.append(f"- 🌐 **Web Frameworks:** {', '.join(web_frameworks)}")
                 if backend_frameworks:
-                    md.append(f"   ⚡ Backend: {', '.join(backend_frameworks)}")
+                    md.append(f"- ⚡ **Backend:** {', '.join(backend_frameworks)}")
                 if ui_frameworks:
-                    md.append(f"   🖥️ UI Development: {', '.join(ui_frameworks)}")
+                    md.append(f"- 🖥️ **UI Development:** {', '.join(ui_frameworks)}")
             elif language == "Java":
-                md.append(f"   🍃 Spring Framework - Full-stack development")
+                md.append(f"- 🍃 **Spring Framework** - Full-stack development")
                 if "Apache Kafka" in frameworks:
-                    md.append(f"   📨 Apache Kafka - Message streaming")
+                    md.append(f"- 📨 **Apache Kafka** - Message streaming")
                 if "Microservices" in frameworks:
-                    md.append(f"   🔧 Microservices - Distributed architecture")
+                    md.append(f"- 🔧 **Microservices** - Distributed architecture")
             elif language == "Dart":
                 if "Flutter" in frameworks:
-                    md.append(f"   📱 Flutter - Native mobile apps")
+                    md.append(f"- 📱 **Flutter** - Cross-platform mobile development")
                 if "Material Design" in frameworks:
-                    md.append(f"   🎨 Material Design - Beautiful UIs")
+                    md.append(f"- 🎨 **Material Design** - Modern UI components")
             elif language == "TypeScript":
-                md.append(f"   ⚛️ React + TypeScript/JavaScript")
+                md.append(f"- ⚛️ **React + TypeScript** - Modern web development")
             elif language == "Vue":
-                md.append(f"   💚 Vue.js - Progressive framework")
+                md.append(f"- 💚 **Vue.js** - Progressive JavaScript framework")
             elif language in ["CSS", "SCSS"]:
-                md.append(f"   🎨 SCSS/CSS - Modern styling")
+                md.append(f"- 🎨 **SCSS/CSS** - Modern styling and design")
             elif language in ["Jupyter Notebook", "Python"]:
-                md.append(f"   🐍 Python - Data science & ML")
-                md.append(f"   📈 Machine Learning - Predictive models")
+                md.append(f"- 🐍 **Python** - Data science & machine learning")
+                md.append(f"- 📈 **Machine Learning** - Predictive analytics")
             else:
-                # For other languages, display normally
-                framework_line = " - ".join(frameworks)
-                md.append(f"   {framework_line}")
+                # For other languages, display frameworks as bullet points
+                for framework in frameworks:
+                    md.append(f"- {framework}")
         
-        md.append("")  # Add spacing
+        md.append("")  # Add spacing between technologies
     
     def calculate_user_stats(self) -> Dict[str, int]:
         """Calculate user statistics based on repository data."""
@@ -486,11 +498,6 @@ class GitHubLanguageAnalyzer:
         md.append(tech_stack_md)
         md.append("")
         
-        # User Statistics Section
-        user_stats_md = self.format_user_stats_markdown(ranking_data.get('user_stats', {}))
-        md.append(user_stats_md)
-        md.append("")
-        
         # Programming Language Rankings Section
         md.append("## 🔥 Programming Language Rankings\n")
         md.append(f"*Based on analysis of {ranking_data['total_repositories']} repositories ({ranking_data['owned_repositories']} owned + {ranking_data['contributed_repositories']} contributed)*\n")
@@ -515,6 +522,11 @@ class GitHubLanguageAnalyzer:
             
             md.append(f"{position} {language} - {percentage:.1f}%\n")
             md.append(f"{bar} {bytes_count:,} bytes / {lines_count:,} lines of code\n")
+        
+        # User Statistics Section (moved to last)
+        md.append("")
+        user_stats_md = self.format_user_stats_markdown(ranking_data.get('user_stats', {}))
+        md.append(user_stats_md)
         
         return "\n".join(md)
 
