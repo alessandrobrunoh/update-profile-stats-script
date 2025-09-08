@@ -1,0 +1,128 @@
+{
+  "total_repositories": 23,
+  "owned_repositories": 19,
+  "contributed_repositories": 4,
+  "language_stats": {
+    "Rust": 120000,
+    "Java": 36000,
+    "TypeScript": 8000,
+    "Jupyter Notebook": 10000,
+    "Vue": 10000,
+    "SCSS": 4000,
+    "Dart": 12000,
+    "C++": 10000
+  },
+  "language_lines": {
+    "Rust": 16000,
+    "Java": 5400,
+    "TypeScript": 1200,
+    "Jupyter Notebook": 1200,
+    "Vue": 1500,
+    "SCSS": 500,
+    "Dart": 1800,
+    "C++": 1600
+  },
+  "language_percentages": {
+    "Rust": 57.14285714285714,
+    "Java": 17.142857142857142,
+    "TypeScript": 3.8095238095238098,
+    "Jupyter Notebook": 4.761904761904762,
+    "Vue": 4.761904761904762,
+    "SCSS": 1.9047619047619049,
+    "Dart": 5.714285714285714,
+    "C++": 4.761904761904762
+  },
+  "language_repositories": {
+    "Rust": [
+      "DioxusTest",
+      "KetchApp-Auth-Api",
+      "Tokio-TCP-Chat-Test",
+      "LeptosTest",
+      "SycamoreTest",
+      "gpuiTest",
+      "AlbionManagerDiscord",
+      "RustProject"
+    ],
+    "Java": [
+      "KetchApp-Kafka",
+      "KetchApp-API",
+      "KetchApp-BFF"
+    ],
+    "CSS": [
+      "Progetto-Fondamenti-Web"
+    ],
+    "Makefile": [
+      "leptos_styles"
+    ],
+    "TypeScript": [
+      "ReactTest"
+    ],
+    "Jupyter Notebook": [
+      "Progetto-Machine-Learning",
+      "Progetto-Big-Data"
+    ],
+    "Vue": [
+      "Progetto-Ingegneria-Web"
+    ],
+    "SCSS": [
+      "alessandrobrunoh.github.io"
+    ],
+    "Dart": [
+      "KetchApp-Flutter"
+    ],
+    "C++": [
+      "KetchApp-Flutter"
+    ]
+  },
+  "ranking": [
+    [
+      "Rust",
+      120000
+    ],
+    [
+      "Java",
+      36000
+    ],
+    [
+      "Dart",
+      12000
+    ],
+    [
+      "Jupyter Notebook",
+      10000
+    ],
+    [
+      "Vue",
+      10000
+    ],
+    [
+      "C++",
+      10000
+    ],
+    [
+      "TypeScript",
+      8000
+    ],
+    [
+      "SCSS",
+      4000
+    ]
+  ],
+  "excluded_languages": [
+    "HTML",
+    "CSS",
+    "Makefile",
+    "Dockerfile"
+  ],
+  "excluded_repositories": [],
+  "user_stats": {
+    "total_commits": 515,
+    "total_contributions": 535,
+    "total_pull_requests": 50,
+    "total_issues_created": 23,
+    "total_stars_gained": 38,
+    "total_repositories": 23,
+    "owned_repositories": 19,
+    "contributed_repositories": 4
+  }
+}
