@@ -81,13 +81,32 @@ class GitHubLanguageAnalyzer:
         }
         return language_size_estimates.get(language, 3000)
     
-    def analyze_all_repositories(self) -> Tuple[Dict[str, int], Dict[str, List[str]]]:
+    def estimate_language_lines(self, language: str) -> int:
+        """Estimate lines of code for a language based on typical project sizes."""
+        # Rough estimates based on average lines per language type
+        language_lines_estimates = {
+            'Rust': 2000,
+            'Java': 1800,
+            'TypeScript': 1200,
+            'CSS': 800,
+            'Vue': 1500,
+            'Jupyter Notebook': 600,
+            'SCSS': 500,
+            'Makefile': 100,
+            'Dart': 1800,  # Similar to Java for mobile development
+            'C++': 1600,   # Native development tends to be verbose
+            None: 50  # For repositories without a primary language
+        }
+        return language_lines_estimates.get(language, 400)
+    
+    def analyze_all_repositories(self) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, List[str]]]:
         """Analyze all repositories and return language statistics."""
         print(f"Analyzing repositories for user: {self.username}")
         repos = self.get_user_repositories()
         print(f"Found {len(repos)} repositories")
         
         total_languages = defaultdict(int)
+        total_lines = defaultdict(int)
         language_repos = defaultdict(list)
         
         for repo in repos:
@@ -99,12 +118,14 @@ class GitHubLanguageAnalyzer:
                 for language in languages:
                     if language:  # Skip empty language entries
                         estimated_bytes = self.estimate_language_bytes(language)
+                        estimated_lines = self.estimate_language_lines(language)
                         total_languages[language] += estimated_bytes
+                        total_lines[language] += estimated_lines
                         language_repos[language].append(repo_name)
             else:
                 print(f"Repository: {repo_name} -> No languages detected")
         
-        return dict(total_languages), dict(language_repos)
+        return dict(total_languages), dict(total_lines), dict(language_repos)
     
     def calculate_percentages(self, language_stats: Dict[str, int]) -> Dict[str, float]:
         """Calculate percentage usage for each language."""
@@ -122,11 +143,16 @@ class GitHubLanguageAnalyzer:
         if exclude_languages is None:
             exclude_languages = self.config.get('excluded_languages', ['HTML', 'CSS', 'Makefile', 'Dockerfile'])
         
-        language_stats, language_repos = self.analyze_all_repositories()
+        language_stats, language_lines, language_repos = self.analyze_all_repositories()
         
         # Filter out excluded languages
         filtered_stats = {
             lang: bytes_count for lang, bytes_count in language_stats.items()
+            if lang not in exclude_languages
+        }
+        
+        filtered_lines = {
+            lang: lines_count for lang, lines_count in language_lines.items()
             if lang not in exclude_languages
         }
         
@@ -149,6 +175,7 @@ class GitHubLanguageAnalyzer:
             'owned_repositories': len(owned_repos),
             'contributed_repositories': len(contributed_repos),
             'language_stats': filtered_stats,
+            'language_lines': filtered_lines,
             'language_percentages': percentages,
             'language_repositories': language_repos,
             'ranking': sorted_languages,
@@ -166,16 +193,22 @@ class GitHubLanguageAnalyzer:
             md.append("No language data available.\n")
             return "\n".join(md)
         
-        for i, (language, bytes_count) in enumerate(ranking_data['ranking'][:10], 1):
+        # Medal emojis for top positions
+        medals = ["🥇", "🥈", "🥉", "4.", "5.", "6.", "7.", "8.", "9.", "10."]
+        
+        for i, (language, bytes_count) in enumerate(ranking_data['ranking'][:10]):
             percentage = ranking_data['language_percentages'][language]
-            repo_count = len(ranking_data['language_repositories'][language])
+            lines_count = ranking_data['language_lines'][language]
             
             # Create progress bar (visual representation)
             bar_length = max(1, int(percentage / 100 * 20))  # Ensure at least 1 char for small percentages
             bar = "█" * bar_length + "░" * (20 - bar_length)
             
-            md.append(f"{i}. **{language}** - {percentage:.1f}% ({repo_count} repos)")
-            md.append(f"   `{bar}` {bytes_count:,} bytes\n")
+            # Use medal emoji for top 3, numbers for the rest
+            position = medals[i] if i < len(medals) else f"{i+1}."
+            
+            md.append(f"{position} {language} - {percentage:.1f}%\n")
+            md.append(f"{bar} {bytes_count:,} bytes / {lines_count:,} lines of code\n")
         
         return "\n".join(md)
 
