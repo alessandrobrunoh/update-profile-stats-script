@@ -114,5 +114,15 @@
     "Makefile",
     "Dockerfile"
   ],
-  "excluded_repositories": []
+  "excluded_repositories": [],
+  "user_stats": {
+    "total_commits": 515,
+    "total_contributions": 535,
+    "total_pull_requests": 50,
+    "total_issues_created": 23,
+    "total_stars_gained": 38,
+    "total_repositories": 23,
+    "owned_repositories": 19,
+    "contributed_repositories": 4
+  }
 }

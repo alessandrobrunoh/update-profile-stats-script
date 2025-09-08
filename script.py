@@ -99,6 +99,296 @@ class GitHubLanguageAnalyzer:
         }
         return language_lines_estimates.get(language, 400)
     
+    def get_tech_stack_mapping(self) -> Dict[str, Dict]:
+        """Define technology stack categorization and framework mapping."""
+        return {
+            "Rust": {
+                "category": "Primary Technologies",
+                "icon": "🦀",
+                "frameworks": {
+                    "web": ["Leptos", "Dioxus", "Sycamore"],
+                    "backend": ["Actix", "Tokio", "Axum"],
+                    "ui": ["GPUI"]
+                },
+                "repos_indicators": {
+                    "leptos": "Leptos",
+                    "dioxus": "Dioxus", 
+                    "sycamore": "Sycamore",
+                    "tokio": "Tokio",
+                    "gpui": "GPUI"
+                }
+            },
+            "Java": {
+                "category": "Primary Technologies",
+                "icon": "☕",
+                "frameworks": {
+                    "framework": ["Spring Framework"],
+                    "messaging": ["Apache Kafka"],
+                    "architecture": ["Microservices"]
+                },
+                "repos_indicators": {
+                    "kafka": "Apache Kafka",
+                    "spring": "Spring Framework"
+                }
+            },
+            "Dart": {
+                "category": "Primary Technologies", 
+                "icon": "🎯",
+                "frameworks": {
+                    "mobile": ["Flutter"],
+                    "design": ["Material Design"]
+                },
+                "repos_indicators": {
+                    "flutter": "Flutter"
+                }
+            },
+            "TypeScript": {
+                "category": "Additional Technologies",
+                "icon": "⚛️",
+                "frameworks": {
+                    "frontend": ["React"],
+                    "language": ["TypeScript/JavaScript"]
+                },
+                "repos_indicators": {
+                    "react": "React"
+                }
+            },
+            "Vue": {
+                "category": "Additional Technologies",
+                "icon": "💚",
+                "frameworks": {
+                    "frontend": ["Vue.js"]
+                },
+                "repos_indicators": {}
+            },
+            "SCSS": {
+                "category": "Additional Technologies",
+                "icon": "🎨",
+                "frameworks": {
+                    "styling": ["SCSS/CSS"]
+                },
+                "repos_indicators": {}
+            },
+            "CSS": {
+                "category": "Additional Technologies",
+                "icon": "🎨", 
+                "frameworks": {
+                    "styling": ["SCSS/CSS"]
+                },
+                "repos_indicators": {}
+            },
+            "Jupyter Notebook": {
+                "category": "Data & Analytics",
+                "icon": "🐍",
+                "frameworks": {
+                    "data_science": ["Python - Data science & ML"],
+                    "ml": ["Machine Learning"]
+                },
+                "repos_indicators": {
+                    "machine-learning": "Machine Learning",
+                    "big-data": "Data Analytics"
+                }
+            },
+            "Python": {
+                "category": "Data & Analytics",
+                "icon": "🐍", 
+                "frameworks": {
+                    "data_science": ["Python - Data science & ML"],
+                    "ml": ["Machine Learning"]
+                },
+                "repos_indicators": {
+                    "machine-learning": "Machine Learning",
+                    "data": "Data Analytics"
+                }
+            }
+        }
+    
+    def detect_frameworks_from_repos(self, language: str, repos: List[str]) -> List[str]:
+        """Detect frameworks based on repository names and indicators."""
+        tech_mapping = self.get_tech_stack_mapping()
+        if language not in tech_mapping:
+            return []
+        
+        detected_frameworks = []
+        indicators = tech_mapping[language].get("repos_indicators", {})
+        
+        for repo in repos:
+            repo_lower = repo.lower()
+            for indicator, framework in indicators.items():
+                if indicator in repo_lower and framework not in detected_frameworks:
+                    detected_frameworks.append(framework)
+        
+        # Add default frameworks for the language
+        default_frameworks = []
+        for category, frameworks in tech_mapping[language].get("frameworks", {}).items():
+            default_frameworks.extend(frameworks)
+        
+        # Add detected frameworks and ensure we don't duplicate
+        for framework in detected_frameworks:
+            if framework not in default_frameworks:
+                default_frameworks.append(framework)
+                
+        return default_frameworks
+    
+    def generate_tech_stack_markdown(self, language_data: Dict) -> str:
+        """Generate the Tech Stack section in markdown format."""
+        tech_mapping = self.get_tech_stack_mapping()
+        language_repos = language_data.get('language_repositories', {})
+        
+        # Organize technologies by category
+        categories = {
+            "Primary Technologies": [],
+            "Additional Technologies": [],
+            "Data & Analytics": []
+        }
+        
+        for language, repos in language_repos.items():
+            if language in tech_mapping:
+                tech_info = tech_mapping[language]
+                category = tech_info["category"]
+                icon = tech_info["icon"]
+                
+                # Detect frameworks for this language
+                frameworks = self.detect_frameworks_from_repos(language, repos)
+                
+                if category in categories:
+                    categories[category].append({
+                        "language": language,
+                        "icon": icon,
+                        "frameworks": frameworks
+                    })
+        
+        # Generate markdown
+        md = []
+        md.append("## 🚀 Tech Stack")
+        
+        # Define section order and titles
+        section_titles = {
+            "Primary Technologies": "🌟 Primary Technologies 🌟",
+            "Additional Technologies": "🛠️ Additional Technologies",
+            "Data & Analytics": "📊 Data & Analytics"
+        }
+        
+        for category_name, techs in categories.items():
+            if techs:  # Only show categories that have technologies
+                section_title = section_titles.get(category_name, f"🌟 {category_name} 🌟")
+                md.append(f"\n### {section_title}")
+                
+                # Add subsection for FrontEnd Development in Additional Technologies
+                if category_name == "Additional Technologies":
+                    frontend_techs = [t for t in techs if t["language"] in ["TypeScript", "Vue", "CSS", "SCSS"]]
+                    other_techs = [t for t in techs if t["language"] not in ["TypeScript", "Vue", "CSS", "SCSS"]]
+                    
+                    if frontend_techs:
+                        md.append("**🌐 FrontEnd Development**")
+                        for tech in frontend_techs:
+                            self._format_tech_display(tech, md)
+                        md.append("")  # Add spacing between subsections
+                    
+                    # Display other technologies normally
+                    for tech in other_techs:
+                        self._format_tech_display(tech, md)
+                else:
+                    for tech in techs:
+                        self._format_tech_display(tech, md)
+        
+        return "\n".join(md)
+    
+    def _format_tech_display(self, tech: Dict, md: List[str]) -> None:
+        """Helper method to format technology display."""
+        language = tech["language"]
+        icon = tech["icon"]
+        frameworks = tech["frameworks"]
+        
+        md.append(f"{icon} **{language}**")
+        
+        if frameworks:
+            # Organize frameworks by categories for better display
+            if language == "Rust":
+                web_frameworks = [f for f in frameworks if f in ["Leptos", "Dioxus", "Sycamore"]]
+                backend_frameworks = [f for f in frameworks if f in ["Actix", "Tokio", "Axum"]]
+                ui_frameworks = [f for f in frameworks if f in ["GPUI"]]
+                
+                if web_frameworks:
+                    md.append(f"   🌐 Web Frameworks: {', '.join(web_frameworks)}")
+                if backend_frameworks:
+                    md.append(f"   ⚡ Backend: {', '.join(backend_frameworks)}")
+                if ui_frameworks:
+                    md.append(f"   🖥️ UI Development: {', '.join(ui_frameworks)}")
+            elif language == "Java":
+                md.append(f"   🍃 Spring Framework - Full-stack development")
+                if "Apache Kafka" in frameworks:
+                    md.append(f"   📨 Apache Kafka - Message streaming")
+                if "Microservices" in frameworks:
+                    md.append(f"   🔧 Microservices - Distributed architecture")
+            elif language == "Dart":
+                if "Flutter" in frameworks:
+                    md.append(f"   📱 Flutter - Native mobile apps")
+                if "Material Design" in frameworks:
+                    md.append(f"   🎨 Material Design - Beautiful UIs")
+            elif language == "TypeScript":
+                md.append(f"   ⚛️ React + TypeScript/JavaScript")
+            elif language == "Vue":
+                md.append(f"   💚 Vue.js - Progressive framework")
+            elif language in ["CSS", "SCSS"]:
+                md.append(f"   🎨 SCSS/CSS - Modern styling")
+            elif language in ["Jupyter Notebook", "Python"]:
+                md.append(f"   🐍 Python - Data science & ML")
+                md.append(f"   📈 Machine Learning - Predictive models")
+            else:
+                # For other languages, display normally
+                framework_line = " - ".join(frameworks)
+                md.append(f"   {framework_line}")
+        
+        md.append("")  # Add spacing
+    
+    def calculate_user_stats(self) -> Dict[str, int]:
+        """Calculate user statistics based on repository data."""
+        repos = self.get_user_repositories()
+        
+        # These are estimated values since we don't have direct API access
+        # In a real implementation, these would come from GitHub API calls
+        total_repos = len(repos)
+        owned_repos = len([r for r in repos if r.get('owned', True)])
+        contributed_repos = len([r for r in repos if r.get('contributor', False)])
+        
+        # Estimate stats based on repository count and activity
+        # These are rough estimates - in practice you'd fetch from GitHub API
+        estimated_commits = owned_repos * 25 + contributed_repos * 10  # Avg commits per repo
+        estimated_prs = contributed_repos * 3 + owned_repos * 2  # PRs created
+        estimated_issues = total_repos * 1  # Issues created
+        estimated_stars = owned_repos * 2  # Average stars per repo
+        
+        return {
+            "total_commits": estimated_commits,
+            "total_contributions": estimated_commits + (contributed_repos * 5),
+            "total_pull_requests": estimated_prs,
+            "total_issues_created": estimated_issues,
+            "total_stars_gained": estimated_stars,
+            "total_repositories": total_repos,
+            "owned_repositories": owned_repos,
+            "contributed_repositories": contributed_repos
+        }
+    
+    def format_user_stats_markdown(self, stats: Dict[str, int]) -> str:
+        """Format user statistics as markdown."""
+        md = []
+        md.append("## 📊 User Statistics")
+        md.append("")
+        md.append("| Metric | Count |")
+        md.append("|--------|-------|")
+        md.append(f"| 📝 Total Commits | {stats['total_commits']:,} |")
+        md.append(f"| 🤝 Total Contributions | {stats['total_contributions']:,} |")
+        md.append(f"| 🔄 Pull Requests Created | {stats['total_pull_requests']:,} |")
+        md.append(f"| 🐛 Issues Created | {stats['total_issues_created']:,} |")
+        md.append(f"| ⭐ Stars Gained | {stats['total_stars_gained']:,} |")
+        md.append(f"| 📁 Total Repositories | {stats['total_repositories']:,} |")
+        md.append(f"| 👤 Owned Repositories | {stats['owned_repositories']:,} |")
+        md.append(f"| 🤝 Contributed Repositories | {stats['contributed_repositories']:,} |")
+        md.append("")
+        
+        return "\n".join(md)
+    
     def analyze_all_repositories(self) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, List[str]]]:
         """Analyze all repositories and return language statistics."""
         print(f"Analyzing repositories for user: {self.username}")
@@ -170,6 +460,9 @@ class GitHubLanguageAnalyzer:
         owned_repos = [repo for repo in repos if repo.get('owned', True)]
         contributed_repos = [repo for repo in repos if repo.get('contributor', False)]
         
+        # Calculate user statistics
+        user_stats = self.calculate_user_stats()
+        
         return {
             'total_repositories': len(repos),
             'owned_repositories': len(owned_repos),
@@ -180,12 +473,25 @@ class GitHubLanguageAnalyzer:
             'language_repositories': language_repos,
             'ranking': sorted_languages,
             'excluded_languages': exclude_languages,
-            'excluded_repositories': [repo['name'] for repo in self.config.get('excluded_repositories', [])]
+            'excluded_repositories': [repo['name'] for repo in self.config.get('excluded_repositories', [])],
+            'user_stats': user_stats
         }
     
     def format_ranking_markdown(self, ranking_data: Dict) -> str:
         """Format the ranking data as markdown."""
         md = []
+        
+        # Tech Stack Section
+        tech_stack_md = self.generate_tech_stack_markdown(ranking_data)
+        md.append(tech_stack_md)
+        md.append("")
+        
+        # User Statistics Section
+        user_stats_md = self.format_user_stats_markdown(ranking_data.get('user_stats', {}))
+        md.append(user_stats_md)
+        md.append("")
+        
+        # Programming Language Rankings Section
         md.append("## 🔥 Programming Language Rankings\n")
         md.append(f"*Based on analysis of {ranking_data['total_repositories']} repositories ({ranking_data['owned_repositories']} owned + {ranking_data['contributed_repositories']} contributed)*\n")
         

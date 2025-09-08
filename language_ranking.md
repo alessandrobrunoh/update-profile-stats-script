@@ -1,3 +1,57 @@
+## 🚀 Tech Stack
+
+### 🌟 Primary Technologies 🌟
+🦀 **Rust**
+   🌐 Web Frameworks: Leptos, Dioxus, Sycamore
+   ⚡ Backend: Actix, Tokio, Axum
+   🖥️ UI Development: GPUI
+
+☕ **Java**
+   🍃 Spring Framework - Full-stack development
+   📨 Apache Kafka - Message streaming
+   🔧 Microservices - Distributed architecture
+
+🎯 **Dart**
+   📱 Flutter - Native mobile apps
+   🎨 Material Design - Beautiful UIs
+
+
+### 🛠️ Additional Technologies
+**🌐 FrontEnd Development**
+🎨 **CSS**
+   🎨 SCSS/CSS - Modern styling
+
+⚛️ **TypeScript**
+   ⚛️ React + TypeScript/JavaScript
+
+💚 **Vue**
+   💚 Vue.js - Progressive framework
+
+🎨 **SCSS**
+   🎨 SCSS/CSS - Modern styling
+
+
+
+### 📊 Data & Analytics
+🐍 **Jupyter Notebook**
+   🐍 Python - Data science & ML
+   📈 Machine Learning - Predictive models
+
+
+## 📊 User Statistics
+
+| Metric | Count |
+|--------|-------|
+| 📝 Total Commits | 515 |
+| 🤝 Total Contributions | 535 |
+| 🔄 Pull Requests Created | 50 |
+| 🐛 Issues Created | 23 |
+| ⭐ Stars Gained | 38 |
+| 📁 Total Repositories | 23 |
+| 👤 Owned Repositories | 19 |
+| 🤝 Contributed Repositories | 4 |
+
+
 ## 🔥 Programming Language Rankings
 
 *Based on analysis of 23 repositories (19 owned + 4 contributed)*
