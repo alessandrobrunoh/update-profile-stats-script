@@ -32,7 +32,7 @@ jobs:
         
     - name: Run profile stats script
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: python3 script.py
       
     - name: Commit and push updated files
