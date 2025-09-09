@@ -1,77 +1,134 @@
-# GitHub Profile Stats Script
+# Hi there! 👋 I'm Alessandro
 
-A Python script that automatically generates comprehensive GitHub profile statistics including tech stack categorization, user metrics, and programming language rankings using real-time GitHub API data.
+## 💡 About Me
 
-## 🚀 Features
+* 📚 **Computer Science Student** at University of Bologna, Italy
+* 🦀 **Passionate about** Rust, Backend Development, Frontend Design, and User Experience
+* 🎨 **Design tools** - Figma for UI/UX design and prototyping
+* 🕹️ **Gaming enthusiast** - Albion Online, Minecraft, Overwatch, No Man's Sky
+* 🌍 **Based in** Bologna, Italy
 
-### Auto Update Action Workflow
-Automatically update the README.md every night.
+---
 
-### Tech Stack Category Generation
-Automatically categorizes and displays your technologies:
-- **Primary Technologies**: Rust, Java, Dart with framework detection
-- **Additional Technologies**: Frontend development tools (React, Vue.js, SCSS/CSS)
-- **Data & Analytics**: Python, Machine Learning tools
+## 🚀 Tech Stack
 
-### User Statistics
-Displays comprehensive metrics:
-- Total commits and contributions
-- Pull requests and issues created  
-- Stars gained across repositories
-- Repository counts (owned vs contributed)
+### ⭐ Primary Technologies
 
-### Programming Language Rankings
-Visual representation of:
-- Language usage percentages
-- Lines of code and bytes analysis
-- Repository-based language detection
+**🦀 Rust**
 
-### GitHub API Integration
-Fetches real-time data:
-- Live repository information from GitHub API
-- Actual language statistics and byte counts
-- Intelligent fallback to static data when API unavailable
-- Authenticated requests for higher rate limits
+- 🌐 **Web Frameworks:** Leptos, Dioxus, Sycamore
+- ⚡ **Backend:** Actix, Tokio, Axum
+- 🖥️ **UI Development:** GPUI
 
-## 🔧 Quick Start
+**☕ Java**
 
-## 🔐 1. GitHub API Authentication Setup
+- 🍃 **Spring Framework** - Full-stack development
+- 📨 **Apache Kafka** - Message streaming
+- 🔧 **Microservices** - Distributed architecture
 
-For best results and to avoid rate limiting, set up a GitHub Personal Access Token.
 
-### Creating a GitHub Personal Access Token
+### 🛠️ Additional Technologies
 
-1. **Go to GitHub Settings**
-   - Navigate to [GitHub Personal Access Tokens](https://github.com/settings/tokens)
-   - Or: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+#### 🌐 Frontend Development
 
-2. **Generate New Token**
-   - Click "Generate new token" → "Generate new token (classic)"
-   - Give it a descriptive name like "Repository Stats Script"
+**🎨 SCSS**
 
-3. **Configure Token Permissions**
-   Select the following scopes:
-   - ✅ `public_repo` - Access public repositories
-   - ✅ `read:user` - Read user profile data
-   - ✅ `read:org` - Read organization data (if analyzing org repos)
+- 🎨 **SCSS/CSS** - Modern styling and design
 
-4. **Generate and Copy Token**
-   - Click "Generate token"
-   - **Copy the token immediately** (you won't see it again!)
+**🎨 CSS**
 
-### Setting Up the Token
+- 🎨 **SCSS/CSS** - Modern styling and design
 
-#### GitHub Actions Secret
-1. **Add Repository Secret**
-   - Go to your repository → Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `GIT_TOKEN`
-   - Value: Your personal access token
-  
-2. **Copy GitHub Actions Workflow in your Repo**
+**💚 Vue**
 
-3. **Run the GitHub Actions Workflow**
+- 💚 **Vue.js** - Progressive JavaScript framework
 
-4. **Enjoy your new Profile**
+**⚛️ TypeScript**
 
-*⭐ Thanks, for using this script, if you appreciate it, please consider starring the repositor!*
+- ⚛️ **React + TypeScript** - Modern web development
+
+
+### 📊 Data & Analytics
+
+**🐍 Jupyter Notebook**
+
+- 🐍 **Python** - Data science & machine learning
+- 📈 **Machine Learning** - Predictive analytics
+
+**🐍 Python**
+
+- 🐍 **Python** - Data science & machine learning
+- 📈 **Machine Learning** - Predictive analytics
+
+
+
+## 🔥 Programming Language Rankings
+
+*Based on analysis of 24 repositories (24 owned + 0 contributed)*
+
+*Rankings now consider code quality, complexity, and maintainability - not just quantity! 🚀*
+
+🥇 Java - 54.6% proficiency (Developing)
+
+██████████░░░░░░░░░░ Quality: 5.300000000000001/10 | Usage: 29.2% | 5,642 lines
+
+🥈 TypeScript - 53.7% proficiency (Developing)
+
+██████████░░░░░░░░░░ Quality: 5.466666666666666/10 | Usage: 25.7% | 4,948 lines
+
+🥉 Rust - 47.2% proficiency (Developing)
+
+█████████░░░░░░░░░░░ Quality: 5.4818181818181815/10 | Usage: 14.7% | 2,823 lines
+
+4. C - 44.2% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.6/10 | Usage: 8.3% | 1,598 lines
+
+5. PLpgSQL - 41.5% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.866666666666667/10 | Usage: 0.7% | 127 lines
+
+6. Python - 41.2% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.449999999999999/10 | Usage: 5.1% | 987 lines
+
+7. Vue - 41.1% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.4/10 | Usage: 5.6% | 1,070 lines
+
+8. RenderScript - 40.6% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.8/10 | Usage: 0.0% | 2 lines
+
+9. SCSS - 40.2% proficiency (Developing)
+
+████████░░░░░░░░░░░░ Quality: 5.214285714285714/10 | Usage: 6.2% | 1,202 lines
+
+10. C++ - 39.6% proficiency (Beginner)
+
+███████░░░░░░░░░░░░░ Quality: 5.6/10 | Usage: 0.7% | 136 lines
+
+## 📊 User Statistics
+
+| Metric | Count |
+|--------|-------|
+| 📝 Total Commits | 600 |
+| 🤝 Total Contributions | 600 |
+| 🔄 Pull Requests Created | 48 |
+| 🐛 Issues Created | 24 |
+| ⭐ Stars Gained | 48 |
+| 📁 Total Repositories | 24 |
+| 👤 Owned Repositories | 24 |
+| 🤝 Contributed Repositories | 0 |
+
+---
+
+## 💭 Quote of the Moment
+
+> "The computer was born to solve problems that did not exist before." - Bill Gates
+
+---
+
+*🤖 This profile was automatically updated on 2025-09-09 at 23:31:55 UTC*
+
+*⭐ If you are interest to use the same script, watch the main repo [update-profile-stats-script](https://github.com/alessandrobrunoh/update-profile-stats-script). Don't forget to leave a little star.*
