@@ -44,6 +44,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add language_ranking.json language_ranking.md
+        git add language_ranking.json language_ranking.md profile_README.md
         git diff --staged --quiet || git commit -m "Update profile stats [automated]"
         git push

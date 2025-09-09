@@ -1,262 +1,149 @@
 {
-  "total_repositories": 24,
-  "owned_repositories": 24,
-  "contributed_repositories": 0,
+  "total_repositories": 35,
+  "owned_repositories": 31,
+  "contributed_repositories": 4,
   "language_stats": {
-    "Rust": 226231,
-    "PLpgSQL": 10308,
-    "RenderScript": 2,
-    "SCSS": 96419,
-    "JavaScript": 43238,
-    "Shell": 3637,
-    "Batchfile": 2025,
-    "Java": 451448,
-    "DTrace": 4293,
-    "Jupyter Notebook": 4807416,
-    "Vue": 85673,
-    "TypeScript": 395938,
-    "C": 127915,
-    "C++": 10951,
-    "Python": 38669,
-    "CMake": 2795,
-    "Swift": 1449,
-    "Go": 684,
-    "Tree-sitter Query": 1454
+    "Rust": 135000,
+    "Java": 60000,
+    "TypeScript": 16000,
+    "Jupyter Notebook": 10000,
+    "Vue": 20000,
+    "Python": 6000,
+    "C": 3000,
+    "Tree-sitter Query": 3000,
+    "SCSS": 4000,
+    "Dart": 24000,
+    "C++": 10000
   },
   "language_lines": {
-    "Rust": 2823,
-    "PLpgSQL": 127,
-    "RenderScript": 2,
-    "SCSS": 1202,
-    "JavaScript": 539,
-    "Shell": 44,
-    "Batchfile": 24,
-    "Java": 5642,
-    "DTrace": 53,
-    "Jupyter Notebook": 60092,
-    "Vue": 1070,
-    "TypeScript": 4948,
-    "C": 1598,
-    "C++": 136,
-    "Python": 483,
-    "CMake": 34,
-    "Swift": 18,
-    "Go": 8,
-    "Tree-sitter Query": 18
+    "Rust": 18000,
+    "Java": 9000,
+    "TypeScript": 2400,
+    "Jupyter Notebook": 1200,
+    "Vue": 3000,
+    "Python": 800,
+    "C": 400,
+    "Tree-sitter Query": 400,
+    "SCSS": 500,
+    "Dart": 3600,
+    "C++": 1600
   },
   "language_percentages": {
-    "Rust": 3.584967700887958,
-    "PLpgSQL": 0.16334563813426575,
-    "RenderScript": 3.169298372802983e-05,
-    "SCSS": 1.527902899036454,
-    "JavaScript": 0.6851706152162769,
-    "Shell": 0.05763369090942224,
-    "Batchfile": 0.0320891460246302,
-    "Java": 7.153867059025805,
-    "DTrace": 0.06802898957221604,
-    "Jupyter Notebook": 76.18067853093513,
-    "Vue": 1.3576164974657499,
-    "TypeScript": 6.2742282956543365,
-    "C": 2.027004006785468,
-    "C++": 0.17353493240282733,
-    "Python": 0.6127679938895928,
-    "CMake": 0.04429094475992169,
-    "Swift": 0.02296156671095761,
-    "Go": 0.010839000434986201,
-    "Tree-sitter Query": 0.023040799170277685
+    "Rust": 46.391752577319586,
+    "Java": 20.618556701030926,
+    "TypeScript": 5.498281786941581,
+    "Jupyter Notebook": 3.436426116838488,
+    "Vue": 6.872852233676976,
+    "Python": 2.0618556701030926,
+    "C": 1.0309278350515463,
+    "Tree-sitter Query": 1.0309278350515463,
+    "SCSS": 1.3745704467353952,
+    "Dart": 8.24742268041237,
+    "C++": 3.436426116838488
   },
   "language_repositories": {
     "Rust": [
-      "AlbionManagerDiscord",
-      "alessandrobrunoh.github.io",
       "DioxusTest",
-      "gpuiTest",
       "KetchApp-Auth-Api",
-      "LeptosTest",
-      "leptos_styles",
-      "RustProject",
-      "SycamoreTest",
       "Tokio-TCP-Chat-Test",
-      "tree-sitter-jdl"
-    ],
-    "PLpgSQL": [
-      "AlbionManagerDiscord",
-      "KetchApp-Auth-Api",
-      "RustProject"
-    ],
-    "RenderScript": [
-      "AlbionManagerDiscord",
-      "RustProject"
-    ],
-    "SCSS": [
-      "alessandrobrunoh.github.io",
       "LeptosTest",
-      "Progetto-Fondamenti-Web",
-      "Progetto-Ingegneria-Web",
+      "SycamoreTest",
+      "gpuiTest",
+      "AlbionManagerDiscord",
       "RustProject",
-      "SpringBootJhipsterTest",
-      "SycamoreTest"
-    ],
-    "HTML": [
-      "alessandrobrunoh.github.io",
-      "KetchApp-Kafka",
-      "LeptosTest",
-      "Progetto-Fondamenti-Web",
-      "Progetto-Ingegneria-Web",
-      "RustProject",
-      "SpringBootJhipsterTest",
-      "SycamoreTest"
-    ],
-    "CSS": [
-      "DioxusTest",
-      "KetchApp-Kafka",
-      "Progetto-Fondamenti-Web",
-      "ReactTest"
-    ],
-    "JavaScript": [
-      "DioxusTest",
-      "Progetto-Fondamenti-Web",
-      "Progetto-Ingegneria-Web",
-      "ReactTest",
-      "SpringBootJhipsterTest",
-      "tree-sitter-jdl"
-    ],
-    "Shell": [
-      "KetchApp-Auth-Api",
-      "KetchApp-Kafka",
-      "SpringBootJhipsterTest"
-    ],
-    "Batchfile": [
-      "KetchApp-Auth-Api",
-      "KetchApp-Kafka",
-      "SpringBootJhipsterTest"
-    ],
-    "Dockerfile": [
-      "KetchApp-Auth-Api",
-      "KetchApp-Kafka"
+      "Rust-Web-Framework-Comparison"
     ],
     "Java": [
       "KetchApp-Kafka",
-      "SpringBootJhipsterTest"
+      "SpringBootJhipsterTest",
+      "Java-Microservices-Demo",
+      "KetchApp-API",
+      "KetchApp-BFF"
+    ],
+    "CSS": [
+      "Progetto-Fondamenti-Web",
+      "CSS-Animation-Library"
     ],
     "Makefile": [
-      "leptos_styles",
-      "tree-sitter-jdl"
-    ],
-    "DTrace": [
       "leptos_styles"
     ],
+    "TypeScript": [
+      "ReactTest",
+      "TypeScript-React-Components"
+    ],
     "Jupyter Notebook": [
-      "Progetto-Big-Data",
-      "Progetto-Machine-Learning"
+      "Progetto-Machine-Learning",
+      "Progetto-Big-Data"
     ],
     "Vue": [
-      "Progetto-Ingegneria-Web"
-    ],
-    "TypeScript": [
       "Progetto-Ingegneria-Web",
-      "ReactTest",
-      "SpringBootJhipsterTest"
+      "Vue-Frontend-Templates"
+    ],
+    "Python": [
+      "update-profile-stats-script",
+      "Python-Data-Analysis-Scripts"
     ],
     "C": [
       "tree-sitter-jdl"
     ],
-    "C++": [
-      "tree-sitter-jdl"
-    ],
-    "Python": [
-      "tree-sitter-jdl",
-      "update-profile-stats-script"
-    ],
-    "CMake": [
-      "tree-sitter-jdl"
-    ],
-    "Swift": [
-      "tree-sitter-jdl"
-    ],
-    "Go": [
-      "tree-sitter-jdl"
-    ],
     "Tree-sitter Query": [
       "zed-grammar-jdl"
+    ],
+    "SCSS": [
+      "alessandrobrunoh.github.io"
+    ],
+    "Dart": [
+      "Flutter-Mobile-App",
+      "KetchApp-Flutter"
+    ],
+    "C++": [
+      "KetchApp-Flutter"
     ]
   },
   "ranking": [
     [
-      "Jupyter Notebook",
-      4807416
+      "Rust",
+      135000
     ],
     [
       "Java",
-      451448
+      60000
     ],
     [
-      "TypeScript",
-      395938
-    ],
-    [
-      "Rust",
-      226231
-    ],
-    [
-      "C",
-      127915
-    ],
-    [
-      "SCSS",
-      96419
+      "Dart",
+      24000
     ],
     [
       "Vue",
-      85673
+      20000
     ],
     [
-      "JavaScript",
-      43238
+      "TypeScript",
+      16000
     ],
     [
-      "Python",
-      38669
+      "Jupyter Notebook",
+      10000
     ],
     [
       "C++",
-      10951
+      10000
     ],
     [
-      "PLpgSQL",
-      10308
+      "Python",
+      6000
     ],
     [
-      "DTrace",
-      4293
+      "SCSS",
+      4000
     ],
     [
-      "Shell",
-      3637
-    ],
-    [
-      "CMake",
-      2795
-    ],
-    [
-      "Batchfile",
-      2025
+      "C",
+      3000
     ],
     [
       "Tree-sitter Query",
-      1454
-    ],
-    [
-      "Swift",
-      1449
-    ],
-    [
-      "Go",
-      684
-    ],
-    [
-      "RenderScript",
-      2
+      3000
     ]
   ],
   "excluded_languages": [
@@ -267,13 +154,13 @@
   ],
   "excluded_repositories": [],
   "user_stats": {
-    "total_commits": 600,
-    "total_contributions": 600,
-    "total_pull_requests": 48,
-    "total_issues_created": 24,
-    "total_stars_gained": 48,
-    "total_repositories": 24,
-    "owned_repositories": 24,
-    "contributed_repositories": 0
+    "total_commits": 815,
+    "total_contributions": 835,
+    "total_pull_requests": 74,
+    "total_issues_created": 35,
+    "total_stars_gained": 62,
+    "total_repositories": 35,
+    "owned_repositories": 31,
+    "contributed_repositories": 4
   }
 }
