@@ -815,6 +815,7 @@ class GitHubLanguageAnalyzer:
         md.append("")
         md.append(f"*🤖 This profile was automatically updated on {self.get_current_timestamp()}*")
         md.append("")
+        md.append(f"⭐ If you are interest to use the same script, watch the main repo [update-profile-stats-script](https://github.com/alessandrobrunoh/update-profile-stats-script). Don't forget to leave a little star.")
         
         return "\n".join(md)
     
