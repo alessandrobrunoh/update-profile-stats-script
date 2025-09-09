@@ -18,11 +18,26 @@ class GitHubLanguageAnalyzer:
         self.config = self.load_config(config_file or 'config.json')
         self.github_api_base = "https://api.github.com"
         self.session = requests.Session()
+        
+        # GitHub API token for authentication
+        self.github_token = os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
+        
         # Set headers for better GitHub API compliance
-        self.session.headers.update({
+        headers = {
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': f'GitHubLanguageAnalyzer/{username}'
-        })
+        }
+        
+        # Add authentication header if token is available
+        if self.github_token:
+            headers['Authorization'] = f'token {self.github_token}'
+            print("✅ GitHub API authentication enabled")
+        else:
+            print("⚠️  No GitHub token found. API requests may be rate limited.")
+            print("   Set GITHUB_TOKEN environment variable for authenticated access.")
+        
+        self.session.headers.update(headers)
+        
         # Cache for repositories to avoid multiple API calls
         self._repositories_cache = None
         # Fallback data for when API is not accessible
@@ -68,21 +83,36 @@ class GitHubLanguageAnalyzer:
         }
 
     def _make_github_request(self, url: str) -> Dict:
-        """Make a request to GitHub API with rate limiting."""
+        """Make a request to GitHub API with rate limiting and authentication."""
         try:
             response = self.session.get(url)
-            if response.status_code == 403 and 'rate limit' in response.text.lower():
-                print("Rate limit reached, waiting 60 seconds...")
-                time.sleep(60)
-                response = self.session.get(url)
+            
+            if response.status_code == 401:
+                print("❌ GitHub API authentication failed. Please check your GITHUB_TOKEN.")
+                return {}
+            elif response.status_code == 403:
+                if 'rate limit' in response.text.lower():
+                    print("⏳ Rate limit reached, waiting 60 seconds...")
+                    time.sleep(60)
+                    response = self.session.get(url)
+                else:
+                    error_msg = response.text
+                    if 'dns monitoring proxy' in error_msg.lower():
+                        print("🚫 GitHub API blocked by network proxy")
+                    else:
+                        print(f"🚫 GitHub API access forbidden: {error_msg}")
+                    return {}
+            elif response.status_code == 404:
+                print(f"🔍 Resource not found: {url}")
+                return {}
             
             if response.status_code == 200:
                 return response.json()
             else:
-                print(f"GitHub API request failed: {response.status_code} - {response.text}")
+                print(f"❌ GitHub API request failed: {response.status_code} - {response.text}")
                 return {}
         except Exception as e:
-            print(f"Error making GitHub API request: {e}")
+            print(f"❌ Error making GitHub API request: {e}")
             return {}
 
     def fetch_user_repositories(self) -> List[Dict]:
@@ -91,7 +121,8 @@ class GitHubLanguageAnalyzer:
         page = 1
         per_page = 100
         
-        print(f"Fetching repositories for user: {self.username}")
+        auth_status = "✅ authenticated" if self.github_token else "⚠️  unauthenticated"
+        print(f"🔍 Fetching repositories for user: {self.username} ({auth_status})")
         
         while True:
             url = f"{self.github_api_base}/users/{self.username}/repos?page={page}&per_page={per_page}"
@@ -101,6 +132,7 @@ class GitHubLanguageAnalyzer:
                 break
                 
             if not isinstance(data, list):
+                print(f"❌ Unexpected API response format: {type(data)}")
                 break
                 
             for repo in data:
@@ -120,7 +152,7 @@ class GitHubLanguageAnalyzer:
             page += 1
             time.sleep(0.1)  # Small delay to be nice to the API
         
-        print(f"Found {len(repos)} repositories")
+        print(f"📊 Found {len(repos)} repositories via GitHub API")
         return repos
 
     def fetch_repository_languages(self, repo: Dict) -> Tuple[List[str], Dict[str, int]]:
@@ -146,11 +178,11 @@ class GitHubLanguageAnalyzer:
         
         # Try to fetch repositories from GitHub API first
         try:
-            print("Attempting to fetch repositories from GitHub API...")
+            print("🚀 Attempting to fetch repositories from GitHub API...")
             repositories = self.fetch_user_repositories()
             
             if repositories:  # If we got data from API
-                print(f"Successfully fetched {len(repositories)} repositories from GitHub API")
+                print(f"✅ Successfully fetched {len(repositories)} repositories from GitHub API")
                 # Filter out forks and excluded repositories
                 filtered_repos = []
                 for repo in repositories:
@@ -158,7 +190,7 @@ class GitHubLanguageAnalyzer:
                         continue
                         
                     # Fetch languages for this repository
-                    print(f"Fetching languages for: {repo['name']}")
+                    print(f"📝 Fetching languages for: {repo['name']}")
                     languages, language_bytes = self.fetch_repository_languages(repo)
                     repo['languages'] = languages
                     repo['language_bytes'] = language_bytes
@@ -167,12 +199,14 @@ class GitHubLanguageAnalyzer:
                 
                 # Cache the results
                 self._repositories_cache = filtered_repos
+                print(f"📊 Using {len(filtered_repos)} repositories from GitHub API")
                 return filtered_repos
             else:
                 raise Exception("No repositories returned from API")
                 
         except Exception as e:
-            print(f"GitHub API not accessible ({e}), falling back to static data...")
+            print(f"⚠️  GitHub API not accessible ({e})")
+            print("📂 Falling back to static repository data...")
             # Fallback to static data
             repositories = self.fallback_repositories_data
             filtered_repos = []
@@ -183,7 +217,7 @@ class GitHubLanguageAnalyzer:
                 repo['language_bytes'] = {}
                 filtered_repos.append(repo)
             
-            print(f"Using {len(filtered_repos)} repositories from fallback data")
+            print(f"📊 Using {len(filtered_repos)} repositories from fallback data")
             # Cache the fallback results
             self._repositories_cache = filtered_repos
             return filtered_repos
