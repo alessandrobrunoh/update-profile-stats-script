@@ -40,3 +40,6 @@ language_ranking.md
 # Test files
 test_*.py
 *_test.py
+
+# Demo files
+*_demo.py
