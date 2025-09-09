@@ -45,44 +45,7 @@ class GitHubLanguageAnalyzer:
         # Fallback data for when API is not accessible (updated to match real repositories + additional to reach 35)
         self.fallback_repositories_data = [
             # Owned repositories (actual 24 + 7 potential additional = 31 to approach 35)
-            {"name": "DioxusTest", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "KetchApp-Kafka", "languages": ["Java"], "fork": False, "owned": True},
-            {"name": "Progetto-Fondamenti-Web", "languages": ["CSS"], "fork": False, "owned": True},
-            {"name": "KetchApp-Auth-Api", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "leptos_styles", "languages": ["Makefile"], "fork": False, "owned": True},
-            {"name": "ReactTest", "languages": ["TypeScript"], "fork": False, "owned": True},
-            {"name": "Tokio-TCP-Chat-Test", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "Progetto-Machine-Learning", "languages": ["Jupyter Notebook"], "fork": False, "owned": True},
-            {"name": "Progetto-Ingegneria-Web", "languages": ["Vue"], "fork": False, "owned": True},
-            {"name": "LeptosTest", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "SycamoreTest", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "Progetto-Big-Data", "languages": ["Jupyter Notebook"], "fork": False, "owned": True},
-            {"name": "gpuiTest", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "AlbionManagerDiscord", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "update-profile-stats-script", "languages": ["Python"], "fork": False, "owned": True},
-            {"name": "RustProject", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "Card-Game-Builder", "languages": [], "fork": False, "owned": True},
-            {"name": "tree-sitter-jdl", "languages": ["C"], "fork": False, "owned": True},
-            {"name": "zed-grammar-jdl", "languages": ["Tree-sitter Query"], "fork": False, "owned": True},
-            {"name": "SpringBootJhipsterTest", "languages": ["Java"], "fork": False, "owned": True},
-            {"name": "My-Zed-IDE-Snippets", "languages": [], "fork": False, "owned": True},
-            {"name": "alessandrobrunoh", "languages": [], "fork": False, "owned": True},
-            {"name": "GPUI-Multi-Page-Ai-Terminal", "languages": [], "fork": False, "owned": True},
-            {"name": "alessandrobrunoh.github.io", "languages": ["SCSS"], "fork": False, "owned": True},
-            # Additional potential repositories to reach target count
-            {"name": "Rust-Web-Framework-Comparison", "languages": ["Rust"], "fork": False, "owned": True},
-            {"name": "Java-Microservices-Demo", "languages": ["Java"], "fork": False, "owned": True},
-            {"name": "Flutter-Mobile-App", "languages": ["Dart"], "fork": False, "owned": True},
-            {"name": "TypeScript-React-Components", "languages": ["TypeScript"], "fork": False, "owned": True},
-            {"name": "Python-Data-Analysis-Scripts", "languages": ["Python"], "fork": False, "owned": True},
-            {"name": "Vue-Frontend-Templates", "languages": ["Vue"], "fork": False, "owned": True},
-            {"name": "CSS-Animation-Library", "languages": ["CSS"], "fork": False, "owned": True},
-            # Contributed repositories - Dibbiii organization
-            {"name": "KetchApp-Flutter", "languages": ["Dart", "C++"], "fork": False, "owned": False, "contributor": True, "organization": "Dibbiii"},
-            {"name": "KetchApp-API", "languages": ["Java"], "fork": False, "owned": False, "contributor": True, "organization": "Dibbiii"},
-            {"name": "KetchApp-BFF", "languages": ["Java"], "fork": False, "owned": False, "contributor": True, "organization": "Dibbiii"},
-            # Contributed repositories - ketchapp-for-study organization
-            {"name": "releases", "languages": [], "fork": False, "owned": False, "contributor": True, "organization": "ketchapp-for-study"}
+            {"name": "Test", "languages": ["Rust"], "fork": False, "owned": True},
         ]
     
     def load_config(self, config_file: str) -> Dict:
@@ -92,7 +55,7 @@ class GitHubLanguageAnalyzer:
                 return json.load(f)
         return {
             "excluded_repositories": [],
-            "excluded_languages": ["HTML", "CSS", "Makefile", "Dockerfile"],
+            "excluded_languages": ["HTML", "CSS", "Makefile", "Dockerfile", "Jupyter Notebook"],
             "included_organizations": [],
             "included_contributors": []
         }
