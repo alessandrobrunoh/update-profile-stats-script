@@ -1,77 +1,56 @@
-# GitHub Profile Stats Script
+# Hi there! 👋 I'm Alessandro
 
-A Python script that automatically generates comprehensive GitHub profile statistics including tech stack categorization, user metrics, and programming language rankings using real-time GitHub API data.
+## 💡 About Me
 
-## 🚀 Features
+* 📚 **Computer Science Student** at University of Bologna, Italy
+* 🦀 **Passionate about** Rust, Backend Development, Frontend Design, and User Experience
+* 🎨 **Design tools** - Figma for UI/UX design and prototyping
+* 🕹️ **Gaming enthusiast** - Albion Online, Minecraft, Overwatch, No Man's Sky
+* 🌍 **Based in** Bologna, Italy
 
-### Auto Update Action Workflow
-Automatically update the README.md every night.
+---
 
-### Tech Stack Category Generation
-Automatically categorizes and displays your technologies:
-- **Primary Technologies**: Rust, Java, Dart with framework detection
-- **Additional Technologies**: Frontend development tools (React, Vue.js, SCSS/CSS)
-- **Data & Analytics**: Python, Machine Learning tools
+## 🚀 Tech Stack
 
-### User Statistics
-Displays comprehensive metrics:
-- Total commits and contributions
-- Pull requests and issues created  
-- Stars gained across repositories
-- Repository counts (owned vs contributed)
+### ⭐ Primary Technologies
 
-### Programming Language Rankings
-Visual representation of:
-- Language usage percentages
-- Lines of code and bytes analysis
-- Repository-based language detection
+**🦀 Rust**
 
-### GitHub API Integration
-Fetches real-time data:
-- Live repository information from GitHub API
-- Actual language statistics and byte counts
-- Intelligent fallback to static data when API unavailable
-- Authenticated requests for higher rate limits
+- 🌐 **Web Frameworks:** Leptos, Dioxus, Sycamore
+- ⚡ **Backend:** Actix, Tokio, Axum
+- 🖥️ **UI Development:** GPUI
 
-## 🔧 Quick Start
 
-## 🔐 1. GitHub API Authentication Setup
 
-For best results and to avoid rate limiting, set up a GitHub Personal Access Token.
+## 🔥 Programming Language Rankings
 
-### Creating a GitHub Personal Access Token
+*Based on analysis of 1 repositories (1 owned + 0 contributed)*
 
-1. **Go to GitHub Settings**
-   - Navigate to [GitHub Personal Access Tokens](https://github.com/settings/tokens)
-   - Or: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+🥇 Rust - 100.0%
 
-2. **Generate New Token**
-   - Click "Generate new token" → "Generate new token (classic)"
-   - Give it a descriptive name like "Repository Stats Script"
+████████████████████ 15,000 bytes / 2,000 lines of code
 
-3. **Configure Token Permissions**
-   Select the following scopes:
-   - ✅ `public_repo` - Access public repositories
-   - ✅ `read:user` - Read user profile data
-   - ✅ `read:org` - Read organization data (if analyzing org repos)
+## 📊 User Statistics
 
-4. **Generate and Copy Token**
-   - Click "Generate token"
-   - **Copy the token immediately** (you won't see it again!)
+| Metric | Count |
+|--------|-------|
+| 📝 Total Commits | 25 |
+| 🤝 Total Contributions | 25 |
+| 🔄 Pull Requests Created | 2 |
+| 🐛 Issues Created | 1 |
+| ⭐ Stars Gained | 2 |
+| 📁 Total Repositories | 1 |
+| 👤 Owned Repositories | 1 |
+| 🤝 Contributed Repositories | 0 |
 
-### Setting Up the Token
+---
 
-#### GitHub Actions Secret
-1. **Add Repository Secret**
-   - Go to your repository → Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `GIT_TOKEN`
-   - Value: Your personal access token
-  
-2. **Copy GitHub Actions Workflow in your Repo**
+## 💭 Quote of the Moment
 
-3. **Run the GitHub Actions Workflow**
+> "In programming, the hard part isn't solving problems, but deciding what problems to solve." - Paul Graham
 
-4. **Enjoy your new Profile**
+---
 
-*⭐ Thanks, for using this script, if you appreciate it, please consider starring the repositor!*
+*🤖 This profile was automatically updated on 2025-09-09 at 23:18:18 UTC*
+
+*⭐ If you are interest to use the same script, watch the main repo [update-profile-stats-script](https://github.com/alessandrobrunoh/update-profile-stats-script). Don't forget to leave a little star.*
