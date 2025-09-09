@@ -20,7 +20,7 @@ class GitHubLanguageAnalyzer:
         self.session = requests.Session()
         
         # GitHub API token for authentication
-        self.github_token = os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
+        self.github_token = os.getenv('GIT_TOKEN') or os.getenv('GH_TOKEN')
         
         # Set headers for better GitHub API compliance
         headers = {
