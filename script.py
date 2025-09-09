@@ -876,13 +876,6 @@ def main():
         
         ranking_data = analyzer.generate_ranking()
         
-        # Save raw data as JSON
-        with open('language_ranking.json', 'w') as f:
-            json.dump(ranking_data, f, indent=2)
-        
-        # Generate markdown report (original format)
-        markdown_report = analyzer.format_ranking_markdown(ranking_data)
-        
         # Generate complete profile README
         profile_readme = analyzer.generate_profile_readme(ranking_data)
         
