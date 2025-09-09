@@ -1,109 +1,77 @@
-# Hi there! 👋 I'm Alessandro
+# GitHub Profile Stats Script
 
-## 💡 About Me
+A Python script that automatically generates comprehensive GitHub profile statistics including tech stack categorization, user metrics, and programming language rankings using real-time GitHub API data.
 
-* 📚 **Computer Science Student** at University of Bologna, Italy
-* 🦀 **Passionate about** Rust, Backend Development, Frontend Design, and User Experience
-* 🎨 **Design tools** - Figma for UI/UX design and prototyping
-* 🕹️ **Gaming enthusiast** - Albion Online, Minecraft, Overwatch, No Man's Sky
-* 🌍 **Based in** Bologna, Italy
+## 🚀 Features
 
----
+### Auto Update Action Workflow
+Automatically update the README.md every night.
 
-## 🚀 Tech Stack
+### Tech Stack Category Generation
+Automatically categorizes and displays your technologies:
+- **Primary Technologies**: Rust, Java, Dart with framework detection
+- **Additional Technologies**: Frontend development tools (React, Vue.js, SCSS/CSS)
+- **Data & Analytics**: Python, Machine Learning tools
 
-### ⭐ Primary Technologies
+### User Statistics
+Displays comprehensive metrics:
+- Total commits and contributions
+- Pull requests and issues created  
+- Stars gained across repositories
+- Repository counts (owned vs contributed)
 
-**🦀 Rust**
+### Programming Language Rankings
+Visual representation of:
+- Language usage percentages
+- Lines of code and bytes analysis
+- Repository-based language detection
 
-- 🌐 **Web Frameworks:** Leptos, Dioxus, Sycamore
-- ⚡ **Backend:** Actix, Tokio, Axum
-- 🖥️ **UI Development:** GPUI
+### GitHub API Integration
+Fetches real-time data:
+- Live repository information from GitHub API
+- Actual language statistics and byte counts
+- Intelligent fallback to static data when API unavailable
+- Authenticated requests for higher rate limits
 
-**☕ Java**
+## 🔧 Quick Start
 
-- 🍃 **Spring Framework** - Full-stack development
-- 📨 **Apache Kafka** - Message streaming
-- 🔧 **Microservices** - Distributed architecture
+## 🔐 1. GitHub API Authentication Setup
 
+For best results and to avoid rate limiting, set up a GitHub Personal Access Token.
 
-### 🛠️ Additional Technologies
+### Creating a GitHub Personal Access Token
 
-#### 🌐 Frontend Development
+1. **Go to GitHub Settings**
+   - Navigate to [GitHub Personal Access Tokens](https://github.com/settings/tokens)
+   - Or: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
 
-**⚛️ TypeScript**
+2. **Generate New Token**
+   - Click "Generate new token" → "Generate new token (classic)"
+   - Give it a descriptive name like "Repository Stats Script"
 
-- ⚛️ **React + TypeScript** - Modern web development
+3. **Configure Token Permissions**
+   Select the following scopes:
+   - ✅ `public_repo` - Access public repositories
+   - ✅ `read:user` - Read user profile data
+   - ✅ `read:org` - Read organization data (if analyzing org repos)
 
-**🎨 CSS**
+4. **Generate and Copy Token**
+   - Click "Generate token"
+   - **Copy the token immediately** (you won't see it again!)
 
-- 🎨 **SCSS/CSS** - Modern styling and design
+### Setting Up the Token
 
-**💚 Vue**
+#### GitHub Actions Secret
+1. **Add Repository Secret**
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `GIT_TOKEN`
+   - Value: Your personal access token
+  
+2. **Copy GitHub Actions Workflow in your Repo**
 
-- 💚 **Vue.js** - Progressive JavaScript framework
+3. **Run the GitHub Actions Workflow**
 
-**🎨 SCSS**
+4. **Enjoy your new Profile**
 
-- 🎨 **SCSS/CSS** - Modern styling and design
-
-
-### 📊 Data & Analytics
-
-**🐍 Jupyter Notebook**
-
-- 🐍 **Python** - Data science & machine learning
-- 📈 **Machine Learning** - Predictive analytics
-
-
-
-## 🔥 Programming Language Rankings
-
-*Based on analysis of 5 repositories (5 owned + 0 contributed)*
-
-*Rankings now consider code quality, complexity, and maintainability - not just quantity! 🚀*
-
-🥇 Rust - 77.9% proficiency (Advanced)
-
-███████████████░░░░░ Quality: 8.5/10 | Usage: 30.6% | 2,000 lines
-
-🥈 Java - 69.3% proficiency (Intermediate)
-
-█████████████░░░░░░░ Quality: 7.8/10 | Usage: 24.5% | 1,800 lines
-
-🥉 Vue - 61.2% proficiency (Intermediate)
-
-████████████░░░░░░░░ Quality: 7.0/10 | Usage: 20.4% | 1,500 lines
-
-4. TypeScript - 60.2% proficiency (Intermediate)
-
-████████████░░░░░░░░ Quality: 7.2/10 | Usage: 16.3% | 1,200 lines
-
-5. SCSS - 53.9% proficiency (Developing)
-
-██████████░░░░░░░░░░ Quality: 7.0/10 | Usage: 8.2% | 500 lines
-
-## 📊 User Statistics
-
-| Metric | Count |
-|--------|-------|
-| 📝 Total Commits | 125 |
-| 🤝 Total Contributions | 125 |
-| 🔄 Pull Requests Created | 10 |
-| 🐛 Issues Created | 5 |
-| ⭐ Stars Gained | 10 |
-| 📁 Total Repositories | 5 |
-| 👤 Owned Repositories | 5 |
-| 🤝 Contributed Repositories | 0 |
-
----
-
-## 💭 Quote of the Moment
-
-> "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." - Martin Fowler
-
----
-
-*🤖 This profile was automatically updated on 2025-09-09 at 23:25:22 UTC*
-
-*⭐ If you are interest to use the same script, watch the main repo [update-profile-stats-script](https://github.com/alessandrobrunoh/update-profile-stats-script). Don't forget to leave a little star.*
+*⭐ Thanks, for using this script, if you appreciate it, please consider starring the repositor!*
