@@ -883,13 +883,10 @@ def main():
         # Generate markdown report (original format)
         markdown_report = analyzer.format_ranking_markdown(ranking_data)
         
-        with open('language_ranking.md', 'w') as f:
-            f.write(markdown_report)
-        
         # Generate complete profile README
         profile_readme = analyzer.generate_profile_readme(ranking_data)
         
-        with open('profile_README.md', 'w') as f:
+        with open('README.md', 'w') as f:
             f.write(profile_readme)
         
         print("Analysis complete!")
