@@ -36,3 +36,7 @@ Thumbs.db
 # Generated files
 language_ranking.json
 language_ranking.md
+
+# Test files
+test_*.py
+*_test.py

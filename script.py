@@ -9,14 +9,39 @@ import json
 from collections import defaultdict
 from typing import Dict, List, Tuple
 import os
+import requests
+import time
 
 class GitHubLanguageAnalyzer:
     def __init__(self, username: str, config_file: str = None):
         self.username = username
         self.config = self.load_config(config_file or 'config.json')
-        # Data manually collected from GitHub API (from previous search results)
-        # Includes both owned repositories and repositories where user has contributed
-        self.repositories_data = [
+        self.github_api_base = "https://api.github.com"
+        self.session = requests.Session()
+        
+        # GitHub API token for authentication
+        self.github_token = os.getenv('GIT_TOKEN') or os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
+        
+        # Set headers for better GitHub API compliance
+        headers = {
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': f'GitHubLanguageAnalyzer/{username}'
+        }
+        
+        # Add authentication header if token is available
+        if self.github_token:
+            headers['Authorization'] = f'token {self.github_token}'
+            print("✅ GitHub API authentication enabled")
+        else:
+            print("⚠️  No GitHub token found. API requests may be rate limited.")
+            print("   Set GIT_TOKEN environment variable for authenticated access.")
+        
+        self.session.headers.update(headers)
+        
+        # Cache for repositories to avoid multiple API calls
+        self._repositories_cache = None
+        # Fallback data for when API is not accessible
+        self.fallback_repositories_data = [
             # Owned repositories
             {"name": "DioxusTest", "languages": ["Rust"], "fork": False, "owned": True},
             {"name": "KetchApp-Kafka", "languages": ["Java"], "fork": False, "owned": True},
@@ -56,12 +81,151 @@ class GitHubLanguageAnalyzer:
             "included_organizations": [],
             "included_contributors": []
         }
-    
+
+    def _make_github_request(self, url: str) -> Dict:
+        """Make a request to GitHub API with rate limiting and authentication."""
+        try:
+            response = self.session.get(url)
+            
+            if response.status_code == 401:
+                print("❌ GitHub API authentication failed. Please check your GIT_TOKEN.")
+                return {}
+            elif response.status_code == 403:
+                if 'rate limit' in response.text.lower():
+                    print("⏳ Rate limit reached, waiting 60 seconds...")
+                    time.sleep(60)
+                    response = self.session.get(url)
+                else:
+                    error_msg = response.text
+                    if 'dns monitoring proxy' in error_msg.lower():
+                        print("🚫 GitHub API blocked by network proxy")
+                    else:
+                        print(f"🚫 GitHub API access forbidden: {error_msg}")
+                    return {}
+            elif response.status_code == 404:
+                print(f"🔍 Resource not found: {url}")
+                return {}
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"❌ GitHub API request failed: {response.status_code} - {response.text}")
+                return {}
+        except Exception as e:
+            print(f"❌ Error making GitHub API request: {e}")
+            return {}
+
+    def fetch_user_repositories(self) -> List[Dict]:
+        """Fetch repositories owned by the user from GitHub API."""
+        repos = []
+        page = 1
+        per_page = 100
+        
+        auth_status = "✅ authenticated" if self.github_token else "⚠️  unauthenticated"
+        print(f"🔍 Fetching repositories for user: {self.username} ({auth_status})")
+        
+        while True:
+            url = f"{self.github_api_base}/users/{self.username}/repos?page={page}&per_page={per_page}"
+            data = self._make_github_request(url)
+            
+            if not data:
+                break
+                
+            if not isinstance(data, list):
+                print(f"❌ Unexpected API response format: {type(data)}")
+                break
+                
+            for repo in data:
+                repo_info = {
+                    "name": repo.get("name", ""),
+                    "languages": [],  # Will be populated later
+                    "fork": repo.get("fork", False),
+                    "owned": True,
+                    "languages_url": repo.get("languages_url", "")
+                }
+                repos.append(repo_info)
+            
+            # If we got less than per_page results, we're done
+            if len(data) < per_page:
+                break
+                
+            page += 1
+            time.sleep(0.1)  # Small delay to be nice to the API
+        
+        print(f"📊 Found {len(repos)} repositories via GitHub API")
+        return repos
+
+    def fetch_repository_languages(self, repo: Dict) -> Tuple[List[str], Dict[str, int]]:
+        """Fetch languages for a specific repository and return both list and byte counts."""
+        if not repo.get("languages_url"):
+            return [], {}
+            
+        languages_data = self._make_github_request(repo["languages_url"])
+        if not languages_data:
+            return [], {}
+            
+        # Return languages sorted by bytes used (most used first) and the byte counts
+        languages = sorted(languages_data.keys(), key=lambda x: languages_data[x], reverse=True)
+        return languages, languages_data
+
     def get_user_repositories(self) -> List[Dict]:
-        """Return the manually collected repository data, excluding configured repositories."""
+        """Fetch current repository data from GitHub API, falling back to static data if API unavailable."""
+        # Return cached data if available
+        if self._repositories_cache is not None:
+            return self._repositories_cache
+            
         excluded_repo_names = [repo['name'] for repo in self.config.get('excluded_repositories', [])]
-        return [repo for repo in self.repositories_data 
-                if not repo.get('fork', False) and repo['name'] not in excluded_repo_names]
+        
+        # Try to fetch repositories from GitHub API first
+        try:
+            print("🚀 Attempting to fetch repositories from GitHub API...")
+            repositories = self.fetch_user_repositories()
+            
+            if repositories:  # If we got data from API
+                print(f"✅ Successfully fetched {len(repositories)} repositories from GitHub API")
+                # Filter out forks and excluded repositories
+                filtered_repos = []
+                for repo in repositories:
+                    if repo.get('fork', False) or repo['name'] in excluded_repo_names:
+                        continue
+                        
+                    # Fetch languages for this repository
+                    print(f"📝 Fetching languages for: {repo['name']}")
+                    languages, language_bytes = self.fetch_repository_languages(repo)
+                    repo['languages'] = languages
+                    repo['language_bytes'] = language_bytes
+                    filtered_repos.append(repo)
+                    time.sleep(0.1)  # Small delay between API calls
+                
+                # Cache the results
+                self._repositories_cache = filtered_repos
+                print(f"📊 Using {len(filtered_repos)} repositories from GitHub API")
+                return filtered_repos
+            else:
+                raise Exception("No repositories returned from API")
+                
+        except Exception as e:
+            print(f"⚠️  GitHub API not accessible ({e})")
+            print("📂 Falling back to static repository data...")
+            # Fallback to static data
+            repositories = self.fallback_repositories_data
+            filtered_repos = []
+            for repo in repositories:
+                if repo.get('fork', False) or repo['name'] in excluded_repo_names:
+                    continue
+                # For fallback data, set empty language_bytes since we don't have real data
+                repo['language_bytes'] = {}
+                filtered_repos.append(repo)
+            
+            print(f"📊 Using {len(filtered_repos)} repositories from fallback data")
+            # Cache the fallback results
+            self._repositories_cache = filtered_repos
+            return filtered_repos
+
+    def refresh_repositories(self):
+        """Force refresh of repository data by clearing the cache."""
+        print("Refreshing repository data...")
+        self._repositories_cache = None
     
     def estimate_language_bytes(self, language: str) -> int:
         """Estimate bytes for a language based on typical project sizes."""
@@ -414,15 +578,25 @@ class GitHubLanguageAnalyzer:
         for repo in repos:
             repo_name = repo['name']
             languages = repo.get('languages', [])
+            language_bytes = repo.get('language_bytes', {})
             
             if languages:
                 print(f"Repository: {repo_name} -> {', '.join(languages)}")
                 for language in languages:
                     if language:  # Skip empty language entries
-                        estimated_bytes = self.estimate_language_bytes(language)
-                        estimated_lines = self.estimate_language_lines(language)
-                        total_languages[language] += estimated_bytes
-                        total_lines[language] += estimated_lines
+                        # Use actual bytes from GitHub API if available, otherwise estimate
+                        actual_bytes = language_bytes.get(language, 0)
+                        if actual_bytes > 0:
+                            total_languages[language] += actual_bytes
+                            # Estimate lines based on actual bytes (rough estimate: 80 chars per line)
+                            estimated_lines = max(1, actual_bytes // 80)
+                            total_lines[language] += estimated_lines
+                        else:
+                            # Fallback to estimates if no actual data
+                            estimated_bytes = self.estimate_language_bytes(language)
+                            estimated_lines = self.estimate_language_lines(language)
+                            total_languages[language] += estimated_bytes
+                            total_lines[language] += estimated_lines
                         language_repos[language].append(repo_name)
             else:
                 print(f"Repository: {repo_name} -> No languages detected")
@@ -538,6 +712,8 @@ def main():
     
     try:
         print("Starting GitHub language analysis...")
+        # Force refresh of repository data to ensure we get the latest information
+        analyzer.refresh_repositories()
         ranking_data = analyzer.generate_ranking()
         
         # Save raw data as JSON
