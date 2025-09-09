@@ -1,36 +1,45 @@
 {
-  "total_repositories": 23,
-  "owned_repositories": 19,
+  "total_repositories": 35,
+  "owned_repositories": 31,
   "contributed_repositories": 4,
   "language_stats": {
-    "Rust": 120000,
-    "Java": 36000,
-    "TypeScript": 8000,
+    "Rust": 135000,
+    "Java": 60000,
+    "TypeScript": 16000,
     "Jupyter Notebook": 10000,
-    "Vue": 10000,
+    "Vue": 20000,
+    "Python": 6000,
+    "C": 3000,
+    "Tree-sitter Query": 3000,
     "SCSS": 4000,
-    "Dart": 12000,
+    "Dart": 24000,
     "C++": 10000
   },
   "language_lines": {
-    "Rust": 16000,
-    "Java": 5400,
-    "TypeScript": 1200,
+    "Rust": 18000,
+    "Java": 9000,
+    "TypeScript": 2400,
     "Jupyter Notebook": 1200,
-    "Vue": 1500,
+    "Vue": 3000,
+    "Python": 800,
+    "C": 400,
+    "Tree-sitter Query": 400,
     "SCSS": 500,
-    "Dart": 1800,
+    "Dart": 3600,
     "C++": 1600
   },
   "language_percentages": {
-    "Rust": 57.14285714285714,
-    "Java": 17.142857142857142,
-    "TypeScript": 3.8095238095238098,
-    "Jupyter Notebook": 4.761904761904762,
-    "Vue": 4.761904761904762,
-    "SCSS": 1.9047619047619049,
-    "Dart": 5.714285714285714,
-    "C++": 4.761904761904762
+    "Rust": 46.391752577319586,
+    "Java": 20.618556701030926,
+    "TypeScript": 5.498281786941581,
+    "Jupyter Notebook": 3.436426116838488,
+    "Vue": 6.872852233676976,
+    "Python": 2.0618556701030926,
+    "C": 1.0309278350515463,
+    "Tree-sitter Query": 1.0309278350515463,
+    "SCSS": 1.3745704467353952,
+    "Dart": 8.24742268041237,
+    "C++": 3.436426116838488
   },
   "language_repositories": {
     "Rust": [
@@ -41,33 +50,50 @@
       "SycamoreTest",
       "gpuiTest",
       "AlbionManagerDiscord",
-      "RustProject"
+      "RustProject",
+      "Rust-Web-Framework-Comparison"
     ],
     "Java": [
       "KetchApp-Kafka",
+      "SpringBootJhipsterTest",
+      "Java-Microservices-Demo",
       "KetchApp-API",
       "KetchApp-BFF"
     ],
     "CSS": [
-      "Progetto-Fondamenti-Web"
+      "Progetto-Fondamenti-Web",
+      "CSS-Animation-Library"
     ],
     "Makefile": [
       "leptos_styles"
     ],
     "TypeScript": [
-      "ReactTest"
+      "ReactTest",
+      "TypeScript-React-Components"
     ],
     "Jupyter Notebook": [
       "Progetto-Machine-Learning",
       "Progetto-Big-Data"
     ],
     "Vue": [
-      "Progetto-Ingegneria-Web"
+      "Progetto-Ingegneria-Web",
+      "Vue-Frontend-Templates"
+    ],
+    "Python": [
+      "update-profile-stats-script",
+      "Python-Data-Analysis-Scripts"
+    ],
+    "C": [
+      "tree-sitter-jdl"
+    ],
+    "Tree-sitter Query": [
+      "zed-grammar-jdl"
     ],
     "SCSS": [
       "alessandrobrunoh.github.io"
     ],
     "Dart": [
+      "Flutter-Mobile-App",
       "KetchApp-Flutter"
     ],
     "C++": [
@@ -77,22 +103,26 @@
   "ranking": [
     [
       "Rust",
-      120000
+      135000
     ],
     [
       "Java",
-      36000
+      60000
     ],
     [
       "Dart",
-      12000
-    ],
-    [
-      "Jupyter Notebook",
-      10000
+      24000
     ],
     [
       "Vue",
+      20000
+    ],
+    [
+      "TypeScript",
+      16000
+    ],
+    [
+      "Jupyter Notebook",
       10000
     ],
     [
@@ -100,12 +130,20 @@
       10000
     ],
     [
-      "TypeScript",
-      8000
+      "Python",
+      6000
     ],
     [
       "SCSS",
       4000
+    ],
+    [
+      "C",
+      3000
+    ],
+    [
+      "Tree-sitter Query",
+      3000
     ]
   ],
   "excluded_languages": [
@@ -116,13 +154,13 @@
   ],
   "excluded_repositories": [],
   "user_stats": {
-    "total_commits": 515,
-    "total_contributions": 535,
-    "total_pull_requests": 50,
-    "total_issues_created": 23,
-    "total_stars_gained": 38,
-    "total_repositories": 23,
-    "owned_repositories": 19,
+    "total_commits": 815,
+    "total_contributions": 835,
+    "total_pull_requests": 74,
+    "total_issues_created": 35,
+    "total_stars_gained": 62,
+    "total_repositories": 35,
+    "owned_repositories": 31,
     "contributed_repositories": 4
   }
 }
