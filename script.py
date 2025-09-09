@@ -20,7 +20,7 @@ class GitHubLanguageAnalyzer:
         self.session = requests.Session()
         
         # GitHub API token for authentication
-        self.github_token = os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
+        self.github_token = os.getenv('GIT_TOKEN') or os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
         
         # Set headers for better GitHub API compliance
         headers = {
@@ -34,7 +34,7 @@ class GitHubLanguageAnalyzer:
             print("✅ GitHub API authentication enabled")
         else:
             print("⚠️  No GitHub token found. API requests may be rate limited.")
-            print("   Set GITHUB_TOKEN environment variable for authenticated access.")
+            print("   Set GIT_TOKEN environment variable for authenticated access.")
         
         self.session.headers.update(headers)
         
@@ -88,7 +88,7 @@ class GitHubLanguageAnalyzer:
             response = self.session.get(url)
             
             if response.status_code == 401:
-                print("❌ GitHub API authentication failed. Please check your GITHUB_TOKEN.")
+                print("❌ GitHub API authentication failed. Please check your GIT_TOKEN.")
                 return {}
             elif response.status_code == 403:
                 if 'rate limit' in response.text.lower():
