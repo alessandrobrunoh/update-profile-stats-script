@@ -38,12 +38,12 @@
 
 ### 📊 Data & Analytics
 
-**🐍 Jupyter Notebook**
+**🐍 Python**
 
 - 🐍 **Python** - Data science & machine learning
 - 📈 **Machine Learning** - Predictive analytics
 
-**🐍 Python**
+**🐍 Jupyter Notebook**
 
 - 🐍 **Python** - Data science & machine learning
 - 📈 **Machine Learning** - Predictive analytics
@@ -54,7 +54,7 @@
 
 *Based on analysis of 24 repositories (24 owned + 0 contributed)*
 
-🥇 Jupyter Notebook - 76.1%
+🥇 Jupyter Notebook - 75.6%
 
 ███████████████░░░░░ 4,807,416 bytes / 60,092 lines of code
 
@@ -62,7 +62,7 @@
 
 █░░░░░░░░░░░░░░░░░░░ 451,448 bytes / 5,642 lines of code
 
-🥉 TypeScript - 6.3%
+🥉 TypeScript - 6.2%
 
 █░░░░░░░░░░░░░░░░░░░ 395,938 bytes / 4,948 lines of code
 
@@ -78,13 +78,13 @@
 
 █░░░░░░░░░░░░░░░░░░░ 96,419 bytes / 1,202 lines of code
 
-7. Vue - 1.4%
+7. Python - 1.4%
+
+█░░░░░░░░░░░░░░░░░░░ 89,927 bytes / 1,123 lines of code
+
+8. Vue - 1.3%
 
 █░░░░░░░░░░░░░░░░░░░ 85,673 bytes / 1,070 lines of code
-
-8. Python - 0.8%
-
-█░░░░░░░░░░░░░░░░░░░ 47,493 bytes / 593 lines of code
 
 9. JavaScript - 0.7%
 

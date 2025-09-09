@@ -6,6 +6,7 @@
     "Rust": 226231,
     "PLpgSQL": 10308,
     "RenderScript": 2,
+    "Python": 89927,
     "SCSS": 96419,
     "JavaScript": 43238,
     "Shell": 3637,
@@ -17,7 +18,6 @@
     "TypeScript": 395938,
     "C": 127915,
     "C++": 10951,
-    "Python": 47493,
     "CMake": 2795,
     "Swift": 1449,
     "Go": 684,
@@ -27,6 +27,7 @@
     "Rust": 2823,
     "PLpgSQL": 127,
     "RenderScript": 2,
+    "Python": 1123,
     "SCSS": 1202,
     "JavaScript": 539,
     "Shell": 44,
@@ -38,32 +39,31 @@
     "TypeScript": 4948,
     "C": 1598,
     "C++": 136,
-    "Python": 593,
     "CMake": 34,
     "Swift": 18,
     "Go": 8,
     "Tree-sitter Query": 18
   },
   "language_percentages": {
-    "Rust": 3.5799618601160974,
-    "PLpgSQL": 0.16311755176822243,
-    "RenderScript": 3.1648729485491354e-05,
-    "SCSS": 1.5257694241307953,
-    "JavaScript": 0.6842138827468375,
-    "Shell": 0.057553214569366025,
-    "Batchfile": 0.032044338604059995,
-    "Java": 7.14387781438305,
-    "DTrace": 0.06793399784060719,
-    "Jupyter Notebook": 76.07430425411145,
-    "Vue": 1.3557208006052504,
-    "TypeScript": 6.265467327513237,
-    "C": 2.0241736160683135,
-    "C++": 0.1732926182978079,
-    "Python": 0.7515465547272204,
-    "CMake": 0.04422909945597417,
-    "Swift": 0.022929504512238484,
-    "Go": 0.010823865484038043,
-    "Tree-sitter Query": 0.023008626335952215
+    "Rust": 3.5560830789636206,
+    "PLpgSQL": 0.1620295378527125,
+    "RenderScript": 3.1437628609373787e-05,
+    "Python": 1.4135458139775783,
+    "SCSS": 1.5155923564436058,
+    "JavaScript": 0.6796500929060519,
+    "Shell": 0.05716932762614624,
+    "Batchfile": 0.03183059896699096,
+    "Java": 7.096227280222289,
+    "DTrace": 0.06748086981002083,
+    "Jupyter Notebook": 75.56687938938065,
+    "Vue": 1.3466779779254403,
+    "TypeScript": 6.22367589816912,
+    "C": 2.010672131784024,
+    "C++": 0.1721367354506262,
+    "CMake": 0.04393408598159987,
+    "Swift": 0.02277656192749131,
+    "Go": 0.010751668984405835,
+    "Tree-sitter Query": 0.022855155999014744
   },
   "language_repositories": {
     "Rust": [
@@ -87,6 +87,11 @@
     "RenderScript": [
       "AlbionManagerDiscord",
       "RustProject"
+    ],
+    "Python": [
+      "alessandrobrunoh",
+      "tree-sitter-jdl",
+      "update-profile-stats-script"
     ],
     "SCSS": [
       "alessandrobrunoh.github.io",
@@ -164,10 +169,6 @@
     "C++": [
       "tree-sitter-jdl"
     ],
-    "Python": [
-      "tree-sitter-jdl",
-      "update-profile-stats-script"
-    ],
     "CMake": [
       "tree-sitter-jdl"
     ],
@@ -207,12 +208,12 @@
       96419
     ],
     [
-      "Vue",
-      85673
+      "Python",
+      89927
     ],
     [
-      "Python",
-      47493
+      "Vue",
+      85673
     ],
     [
       "JavaScript",
