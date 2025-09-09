@@ -26,31 +26,26 @@
 - 📨 **Apache Kafka** - Message streaming
 - 🔧 **Microservices** - Distributed architecture
 
-**🎯 Dart**
-
-- 📱 **Flutter** - Cross-platform mobile development
-- 🎨 **Material Design** - Modern UI components
-
 
 ### 🛠️ Additional Technologies
 
 #### 🌐 Frontend Development
 
-**🎨 CSS**
+**🎨 SCSS**
 
 - 🎨 **SCSS/CSS** - Modern styling and design
 
-**⚛️ TypeScript**
+**🎨 CSS**
 
-- ⚛️ **React + TypeScript** - Modern web development
+- 🎨 **SCSS/CSS** - Modern styling and design
 
 **💚 Vue**
 
 - 💚 **Vue.js** - Progressive JavaScript framework
 
-**🎨 SCSS**
+**⚛️ TypeScript**
 
-- 🎨 **SCSS/CSS** - Modern styling and design
+- ⚛️ **React + TypeScript** - Modern web development
 
 
 ### 📊 Data & Analytics
@@ -69,67 +64,67 @@
 
 ## 🔥 Programming Language Rankings
 
-*Based on analysis of 35 repositories (31 owned + 4 contributed)*
+*Based on analysis of 24 repositories (24 owned + 0 contributed)*
 
-🥇 Rust - 46.4%
+🥇 Jupyter Notebook - 76.1%
 
-█████████░░░░░░░░░░░ 135,000 bytes / 18,000 lines of code
+███████████████░░░░░ 4,807,416 bytes / 60,092 lines of code
 
-🥈 Java - 20.6%
+🥈 Java - 7.1%
 
-████░░░░░░░░░░░░░░░░ 60,000 bytes / 9,000 lines of code
+█░░░░░░░░░░░░░░░░░░░ 451,448 bytes / 5,642 lines of code
 
-🥉 Dart - 8.2%
+🥉 TypeScript - 6.3%
 
-█░░░░░░░░░░░░░░░░░░░ 24,000 bytes / 3,600 lines of code
+█░░░░░░░░░░░░░░░░░░░ 395,938 bytes / 4,948 lines of code
 
-4. Vue - 6.9%
+4. Rust - 3.6%
 
-█░░░░░░░░░░░░░░░░░░░ 20,000 bytes / 3,000 lines of code
+█░░░░░░░░░░░░░░░░░░░ 226,231 bytes / 2,823 lines of code
 
-5. TypeScript - 5.5%
+5. C - 2.0%
 
-█░░░░░░░░░░░░░░░░░░░ 16,000 bytes / 2,400 lines of code
+█░░░░░░░░░░░░░░░░░░░ 127,915 bytes / 1,598 lines of code
 
-6. Jupyter Notebook - 3.4%
+6. SCSS - 1.5%
 
-█░░░░░░░░░░░░░░░░░░░ 10,000 bytes / 1,200 lines of code
+█░░░░░░░░░░░░░░░░░░░ 96,419 bytes / 1,202 lines of code
 
-7. C++ - 3.4%
+7. Vue - 1.4%
 
-█░░░░░░░░░░░░░░░░░░░ 10,000 bytes / 1,600 lines of code
+█░░░░░░░░░░░░░░░░░░░ 85,673 bytes / 1,070 lines of code
 
-8. Python - 2.1%
+8. Python - 0.8%
 
-█░░░░░░░░░░░░░░░░░░░ 6,000 bytes / 800 lines of code
+█░░░░░░░░░░░░░░░░░░░ 47,493 bytes / 593 lines of code
 
-9. SCSS - 1.4%
+9. JavaScript - 0.7%
 
-█░░░░░░░░░░░░░░░░░░░ 4,000 bytes / 500 lines of code
+█░░░░░░░░░░░░░░░░░░░ 43,238 bytes / 539 lines of code
 
-10. C - 1.0%
+10. C++ - 0.2%
 
-█░░░░░░░░░░░░░░░░░░░ 3,000 bytes / 400 lines of code
+█░░░░░░░░░░░░░░░░░░░ 10,951 bytes / 136 lines of code
 
 ## 📊 User Statistics
 
 | Metric | Count |
 |--------|-------|
-| 📝 Total Commits | 815 |
-| 🤝 Total Contributions | 835 |
-| 🔄 Pull Requests Created | 74 |
-| 🐛 Issues Created | 35 |
-| ⭐ Stars Gained | 62 |
-| 📁 Total Repositories | 35 |
-| 👤 Owned Repositories | 31 |
-| 🤝 Contributed Repositories | 4 |
+| 📝 Total Commits | 600 |
+| 🤝 Total Contributions | 600 |
+| 🔄 Pull Requests Created | 48 |
+| 🐛 Issues Created | 24 |
+| ⭐ Stars Gained | 48 |
+| 📁 Total Repositories | 24 |
+| 👤 Owned Repositories | 24 |
+| 🤝 Contributed Repositories | 0 |
 
 ---
 
 ## 💭 Quote of the Moment
 
-> "Code never lies, comments sometimes do." - Ron Jeffries
+> "Talk is cheap. Show me the code." - Linus Torvalds
 
 ---
 
-*🤖 This profile was automatically updated on 2025-09-09 at 20:43:48 UTC*
+*🤖 This profile was automatically updated on 2025-09-09 at 20:49:26 UTC*
