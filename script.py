@@ -23,6 +23,8 @@ class GitHubLanguageAnalyzer:
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': f'GitHubLanguageAnalyzer/{username}'
         })
+        # Cache for repositories to avoid multiple API calls
+        self._repositories_cache = None
         # Fallback data for when API is not accessible
         self.fallback_repositories_data = [
             # Owned repositories
@@ -136,6 +138,10 @@ class GitHubLanguageAnalyzer:
 
     def get_user_repositories(self) -> List[Dict]:
         """Fetch current repository data from GitHub API, falling back to static data if API unavailable."""
+        # Return cached data if available
+        if self._repositories_cache is not None:
+            return self._repositories_cache
+            
         excluded_repo_names = [repo['name'] for repo in self.config.get('excluded_repositories', [])]
         
         # Try to fetch repositories from GitHub API first
@@ -159,6 +165,8 @@ class GitHubLanguageAnalyzer:
                     filtered_repos.append(repo)
                     time.sleep(0.1)  # Small delay between API calls
                 
+                # Cache the results
+                self._repositories_cache = filtered_repos
                 return filtered_repos
             else:
                 raise Exception("No repositories returned from API")
@@ -176,7 +184,14 @@ class GitHubLanguageAnalyzer:
                 filtered_repos.append(repo)
             
             print(f"Using {len(filtered_repos)} repositories from fallback data")
+            # Cache the fallback results
+            self._repositories_cache = filtered_repos
             return filtered_repos
+
+    def refresh_repositories(self):
+        """Force refresh of repository data by clearing the cache."""
+        print("Refreshing repository data...")
+        self._repositories_cache = None
     
     def estimate_language_bytes(self, language: str) -> int:
         """Estimate bytes for a language based on typical project sizes."""
@@ -663,6 +678,8 @@ def main():
     
     try:
         print("Starting GitHub language analysis...")
+        # Force refresh of repository data to ensure we get the latest information
+        analyzer.refresh_repositories()
         ranking_data = analyzer.generate_ranking()
         
         # Save raw data as JSON
