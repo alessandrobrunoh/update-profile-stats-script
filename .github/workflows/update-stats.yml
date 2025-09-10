@@ -141,8 +141,9 @@ jobs:
 
       - name: Run profile stats script
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CI: true
         run: |
           echo "🚀 Running profile stats script..."
           echo "🔑 Using GITHUB_TOKEN and GEMINI_API_KEY from repository secrets"
@@ -158,12 +159,22 @@ jobs:
             exit 1
           fi
 
-          if python script.py; then
-            echo "✅ Script executed successfully"
-          else
-            echo "❌ Script execution failed"
-            exit 1
-          fi
+          # Run script with retry logic for package installation
+          for attempt in 1 2 3; do
+            echo "🔄 Attempt $attempt/3"
+            if python script.py; then
+              echo "✅ Script executed successfully"
+              break
+            else
+              if [ $attempt -eq 3 ]; then
+                echo "❌ Script execution failed after 3 attempts"
+                exit 1
+              else
+                echo "⚠️ Script failed, retrying in 10 seconds..."
+                sleep 10
+              fi
+            fi
+          done
 
       - name: Check for changes
         id: verify-changed-files

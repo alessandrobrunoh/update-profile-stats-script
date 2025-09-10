@@ -7,9 +7,9 @@ import random
 from collections import defaultdict
 from datetime import datetime
 
-def check_and_install_dependencies():
+def ensure_dependencies():
     """
-    Check if required packages are available and install them if needed.
+    Ensure all required packages are available, installing them if needed.
     """
     required_packages = [
         ("requests>=2.31.0", "requests"),
@@ -19,8 +19,9 @@ def check_and_install_dependencies():
         ("pytz>=2023.3", "pytz")
     ]
 
-    missing_packages = []
+    print("🔍 Checking dependencies...")
 
+    missing_packages = []
     for package_spec, import_name in required_packages:
         try:
             __import__(import_name)
@@ -32,11 +33,38 @@ def check_and_install_dependencies():
     if missing_packages:
         print(f"\n📦 Installing {len(missing_packages)} missing packages...")
         try:
-            cmd = [sys.executable, "-m", "pip", "install"] + missing_packages
-            subprocess.check_call(cmd)
+            # Install packages one by one for better error handling
+            for package_spec in missing_packages:
+                print(f"  Installing {package_spec}...")
+                subprocess.check_call([
+                    sys.executable, "-m", "pip", "install",
+                    "--quiet", "--disable-pip-version-check", package_spec
+                ])
+
             print("✅ All packages installed successfully!")
-            print("🔄 Please restart the script for changes to take effect.")
-            sys.exit(0)
+
+            # Force Python to recognize newly installed packages
+            import importlib
+            importlib.invalidate_caches()
+
+            # Re-check imports after installation
+            print("🔍 Verifying installations...")
+            all_available = True
+            for package_spec, import_name in required_packages:
+                if package_spec in missing_packages:
+                    try:
+                        # Try importing with a clean slate
+                        if import_name in sys.modules:
+                            del sys.modules[import_name]
+                        __import__(import_name)
+                        print(f"✅ {import_name} is now available")
+                    except ImportError:
+                        print(f"⚠️ {import_name} installed but may need environment refresh")
+                        all_available = False
+
+            if not all_available and os.getenv('CI'):
+                print("🔄 In CI environment - packages should be available for import")
+
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to install packages: {e}")
             print("\n💡 Please install manually using:")
@@ -46,10 +74,9 @@ def check_and_install_dependencies():
         print("✅ All dependencies are available!")
 
 # Auto-install required packages (replaces requirements.txt)
-print("🔍 Checking dependencies...")
-check_and_install_dependencies()
+ensure_dependencies()
 
-# Now import the packages
+# Import packages (they're already imported by ensure_dependencies, but we'll do it explicitly for clarity)
 import pytz
 import requests
 import tomli
