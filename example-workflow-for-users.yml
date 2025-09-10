@@ -1,29 +1,40 @@
-# 🤖 Automatic GitHub Profile Stats Generator
+# 🤖 GitHub Profile Stats Auto-Updater
 #
-# 📋 SETUP INSTRUCTIONS FOR NEW USERS:
-# 1. Copy this workflow file to: .github/workflows/update-stats.yml
+# 📋 HOW TO USE THIS WORKFLOW:
+# 1. Copy this entire file to: .github/workflows/update-stats.yml in your repository
 # 2. Go to your repository Settings > Secrets and variables > Actions
-# 3. Add these secrets:
-#    - GITHUB_TOKEN: Your GitHub Personal Access Token (with repo permissions)
-#    - GEMINI_API_KEY: Your Google Gemini API key for code analysis
-# 4. That's it! The workflow will automatically download the latest script and run daily
+# 3. Add these required secrets:
+#    • GITHUB_TOKEN: Your GitHub Personal Access Token
+#      - Go to: https://github.com/settings/tokens
+#      - Create token with 'repo' permissions
+#    • GEMINI_API_KEY: Your Google Gemini API key
+#      - Go to: https://aistudio.google.com/app/apikey
+#      - Create a new API key
+# 4. Enable GitHub Actions in your repository (if not already enabled)
+# 5. That's it! The workflow will run automatically and update your README.md
 #
-# 🔧 CUSTOMIZATION (optional):
-# - Edit the cron schedule below to change when it runs
-# - The script will automatically use your GitHub username
-# - Config is downloaded automatically and customized for your account
+# 🔧 CUSTOMIZATION OPTIONS:
+# • Change the schedule below to run at different times
+# • The script automatically detects your GitHub username
+# • No additional configuration files needed!
+#
+# 🎯 WHAT THIS DOES:
+# • Downloads the latest script automatically
+# • Analyzes your repositories and generates profile stats
+# • Creates a beautiful README.md with your coding statistics
+# • Runs daily and commits updates automatically
 
 name: Update Profile Stats
 
 on:
-  # Run daily at 2 AM UTC (customize this schedule as needed)
+  # Run daily at 2 AM UTC (customize the time as needed)
   schedule:
     - cron: "0 2 * * *"
 
-  # Allow manual trigger (click "Run workflow" in Actions tab)
+  # Allow manual trigger (you can click "Run workflow" in Actions tab)
   workflow_dispatch:
 
-  # Run on pushes to main branch (only if workflow changes)
+  # Run when this workflow file is updated
   push:
     branches: [main]
     paths:

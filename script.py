@@ -1,9 +1,55 @@
 import os
+import sys
+import subprocess
 import time
 import base64
 import random
 from collections import defaultdict
 from datetime import datetime
+
+def check_and_install_dependencies():
+    """
+    Check if required packages are available and install them if needed.
+    """
+    required_packages = [
+        ("requests>=2.31.0", "requests"),
+        ("tomli>=2.0.0", "tomli"),
+        ("python-dotenv>=1.0.0", "dotenv"),
+        ("google-generativeai>=0.3.0", "google.generativeai"),
+        ("pytz>=2023.3", "pytz")
+    ]
+
+    missing_packages = []
+
+    for package_spec, import_name in required_packages:
+        try:
+            __import__(import_name)
+            print(f"✅ {import_name} is available")
+        except ImportError:
+            missing_packages.append(package_spec)
+            print(f"❌ {import_name} is missing")
+
+    if missing_packages:
+        print(f"\n📦 Installing {len(missing_packages)} missing packages...")
+        try:
+            cmd = [sys.executable, "-m", "pip", "install"] + missing_packages
+            subprocess.check_call(cmd)
+            print("✅ All packages installed successfully!")
+            print("🔄 Please restart the script for changes to take effect.")
+            sys.exit(0)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to install packages: {e}")
+            print("\n💡 Please install manually using:")
+            print(f"   pip install {' '.join(missing_packages)}")
+            sys.exit(1)
+    else:
+        print("✅ All dependencies are available!")
+
+# Auto-install required packages (replaces requirements.txt)
+print("🔍 Checking dependencies...")
+check_and_install_dependencies()
+
+# Now import the packages
 import pytz
 import requests
 import tomli
@@ -19,7 +65,22 @@ class GitHubLanguageAnalyzer:
         Initializes the analyzer with GitHub credentials and settings.
         """
         self.config = self.load_config(config_path)
-        self.username = username or self.config.get("github", {}).get("username", "default-user")
+
+        # Auto-detect username from multiple sources
+        detected_username = (
+            username or
+            self.config.get("github", {}).get("username") or
+            os.getenv("GITHUB_REPOSITORY_OWNER") or  # GitHub Actions environment
+            os.getenv("GITHUB_ACTOR") or            # GitHub Actions actor
+            self._extract_username_from_repo() or   # From GITHUB_REPOSITORY
+            "default-user"
+        )
+
+        self.username = detected_username
+        if self.username != "default-user":
+            print(f"🔍 Using GitHub username: {self.username}")
+        else:
+            print("⚠️ Could not detect GitHub username. Using default.")
         self.github_token = os.getenv("GITHUB_TOKEN")
         self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.use_simulation = use_simulation
@@ -57,6 +118,15 @@ class GitHubLanguageAnalyzer:
         except tomli.TOMLDecodeError as e:
             print(f"Error: Could not decode the TOML file at '{config_path}': {e}")
             return {}
+
+    def _extract_username_from_repo(self):
+        """
+        Extract username from GITHUB_REPOSITORY environment variable (format: owner/repo).
+        """
+        github_repo = os.getenv("GITHUB_REPOSITORY")
+        if github_repo and "/" in github_repo:
+            return github_repo.split("/")[0]
+        return None
 
     def _make_github_request(self, url, params=None, retries=3, delay=5):
         """
