@@ -8,9 +8,13 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
-  # Run on pushes to main branch
+  # Run on pushes to main branch (only if script.py or config.toml changes)
   push:
     branches: [main]
+    paths:
+      - "script.py"
+      - "config.toml"
+      - ".github/workflows/update-stats.yml"
 
 jobs:
   update-stats:
@@ -21,31 +25,72 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests tomli python-dotenv google-generativeai pytz
 
+      - name: Validate configuration
+        run: |
+          python -c "import tomli; tomli.load(open('config.toml', 'rb'))"
+          echo "✅ Configuration file is valid"
+
       - name: Run profile stats script
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python3 script.py
+        run: |
+          python script.py
+          echo "✅ Script executed successfully"
+
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -f "PROFILE_README.md" ]; then
+            echo "profile_readme_exists=true" >> $GITHUB_OUTPUT
+            if [ -n "$(git status --porcelain PROFILE_README.md)" ]; then
+              echo "changes_detected=true" >> $GITHUB_OUTPUT
+              echo "✅ Changes detected in PROFILE_README.md"
+            else
+              echo "changes_detected=false" >> $GITHUB_OUTPUT
+              echo "ℹ️ No changes detected"
+            fi
+          else
+            echo "profile_readme_exists=false" >> $GITHUB_OUTPUT
+            echo "❌ PROFILE_README.md not found"
+            exit 1
+          fi
 
       - name: Commit and push updated files
+        if: steps.verify-changed-files.outputs.changes_detected == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add PROFILE_README.md
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Copy PROFILE_README.md to README.md
           cp PROFILE_README.md README.md
-          git add README.md
-          git diff --staged --quiet || git commit -m "Update profile stats [automated]"
+
+          # Add files
+          git add PROFILE_README.md README.md
+
+          # Commit with timestamp
+          git commit -m "🤖 Update profile stats - $(date -u '+%Y-%m-%d %H:%M UTC')"
+
+          # Push changes
           git push
+          echo "✅ Changes committed and pushed successfully"
+
+      - name: No changes to commit
+        if: steps.verify-changed-files.outputs.changes_detected == 'false'
+        run: echo "ℹ️ No changes detected, skipping commit"
