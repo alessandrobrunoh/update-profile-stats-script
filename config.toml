@@ -1,0 +1,36 @@
+# Configuration for the GitHub Profile Stats Script
+
+[github]
+username = "alessandrobrunoh"
+exclude_repos = ["repo1-to-exclude", "repo2-to-exclude"]
+
+[exclusions]
+# Files to exclude from analysis
+exclude_files = [
+    ".gitignore",
+    "package-lock.json",
+    "yarn.lock",
+    "go.sum",
+    "go.mod"
+]
+
+# Directories to exclude from analysis
+exclude_dirs = [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    "vendor",
+    "target"
+]
+
+[gemini]
+# Model to use for code analysis
+model = "gemini-2.5-flash"
+
+# Prompt for the Gemini API
+prompt = """
+Analyze the following code snippet and provide a single, estimated quality score between 0 and 100.
+Consider factors like complexity, maintainability, best practices, comments, error handling, and code style.
+Return only the integer score.
+"""
