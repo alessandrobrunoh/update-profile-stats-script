@@ -60,12 +60,20 @@ jobs:
       - name: Download latest script and config
         run: |
           echo "📥 Downloading latest script from repository..."
-          curl -fsSL https://raw.githubusercontent.com/alessandrobrunoh/update-profile-stats-script/refs/heads/main/script.py -o script.py
-          echo "✅ Script downloaded successfully"
+          if curl -fsSL https://raw.githubusercontent.com/alessandrobrunoh/update-profile-stats-script/refs/heads/main/script.py -o script.py; then
+            echo "✅ Script downloaded successfully"
+          else
+            echo "❌ Failed to download script"
+            exit 1
+          fi
 
           echo "📥 Downloading default configuration..."
-          curl -fsSL https://raw.githubusercontent.com/alessandrobrunoh/update-profile-stats-script/refs/heads/main/config.toml -o config.toml
-          echo "✅ Configuration downloaded successfully"
+          if curl -fsSL https://raw.githubusercontent.com/alessandrobrunoh/update-profile-stats-script/refs/heads/main/config.toml -o config.toml; then
+            echo "✅ Configuration downloaded successfully"
+          else
+            echo "❌ Failed to download configuration"
+            exit 1
+          fi
 
       - name: Install required dependencies
         run: |
@@ -78,6 +86,10 @@ jobs:
         id: get-username
         run: |
           USERNAME="${{ github.repository_owner }}"
+          if [ -z "$USERNAME" ]; then
+            echo "❌ Could not detect repository owner"
+            exit 1
+          fi
           echo "username=$USERNAME" >> $GITHUB_OUTPUT
           echo "🔍 Detected repository owner: $USERNAME"
 
@@ -105,9 +117,13 @@ jobs:
           print("Configuration updated successfully")
           EOF
 
-          python update_config.py
-          rm update_config.py
-          echo "✅ Configuration updated"
+          if python update_config.py; then
+            echo "✅ Configuration updated"
+          else
+            echo "❌ Failed to update configuration"
+            exit 1
+          fi
+          rm -f update_config.py
 
       - name: Validate configuration
         run: |
@@ -126,8 +142,13 @@ jobs:
               exit(1)
           EOF
 
-          python validate_config.py
-          rm validate_config.py
+          if python validate_config.py; then
+            echo "✅ Configuration validation passed"
+          else
+            echo "❌ Configuration validation failed"
+            exit 1
+          fi
+          rm -f validate_config.py
 
       - name: Run profile stats script
         env:
@@ -137,8 +158,23 @@ jobs:
           echo "🚀 Running profile stats script..."
           echo "🔑 Using GITHUB_TOKEN and GEMINI_API_KEY from repository secrets"
           echo "👤 Repository owner: ${{ github.repository_owner }}"
-          python script.py
-          echo "✅ Script executed successfully"
+
+          if [ -z "$GITHUB_TOKEN" ]; then
+            echo "❌ GITHUB_TOKEN secret is not set"
+            exit 1
+          fi
+
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "❌ GEMINI_API_KEY secret is not set"
+            exit 1
+          fi
+
+          if python script.py; then
+            echo "✅ Script executed successfully"
+          else
+            echo "❌ Script execution failed"
+            exit 1
+          fi
 
       - name: Check for changes
         id: verify-changed-files
