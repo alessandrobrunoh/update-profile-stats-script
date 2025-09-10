@@ -40,9 +40,9 @@ class GitHubLanguageAnalyzer:
             raise ValueError("GEMINI_API_KEY environment variable not set. It's required for code analysis.")
 
         # Configure the Gemini client
-        genai.configure(api_key=self.gemini_api_key)
+        genai.configure(api_key=self.gemini_api_key)  # type: ignore
         gemini_model_name = self.config.get("gemini", {}).get("model", "gemini-1.5-flash")
-        self.gemini_model = genai.GenerativeModel(gemini_model_name)
+        self.gemini_model = genai.GenerativeModel(gemini_model_name)  # type: ignore
 
     def load_config(self, config_path="config.toml"):
         """
