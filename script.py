@@ -208,27 +208,40 @@ class GitHubLanguageAnalyzer:
         """
         Fetches language data for a specific repository with generated code filtering.
         """
-        url = f"https://api.github.com/repos/{self.username}/{repo_name}/languages"
-        raw_languages = self._make_github_request(url) or {}
+        try:
+            url = f"https://api.github.com/repos/{self.username}/{repo_name}/languages"
+            raw_languages = self._make_github_request(url) or {}
 
-        # Filter out excluded languages
-        excluded_languages = set(self.config.get("github", {}).get("exclude_languages", []))
-        filtered_languages = {
-            lang: bytes_count for lang, bytes_count in raw_languages.items()
-            if lang not in excluded_languages
-        }
+            if not raw_languages:
+                print(f"Warning: No language data available for {repo_name} (may be private or empty)")
+                return {}
 
-        # If enabled, check for generated code and adjust language stats
-        if self.config.get("github", {}).get("exclude_generated_code", True):
-            filtered_languages = self._filter_generated_code_languages(repo_name, filtered_languages)
+            # Filter out excluded languages
+            excluded_languages = set(self.config.get("github", {}).get("exclude_languages", []))
+            filtered_languages = {
+                lang: bytes_count for lang, bytes_count in raw_languages.items()
+                if lang not in excluded_languages
+            }
 
-        return filtered_languages
+            # If enabled, check for generated code and adjust language stats
+            if self.config.get("github", {}).get("exclude_generated_code", True):
+                filtered_languages = self._filter_generated_code_languages(repo_name, filtered_languages)
+
+            return filtered_languages
+        except Exception as e:
+            print(f"Warning: Could not fetch languages for {repo_name}: {e}")
+            return {}
 
     def _filter_generated_code_languages(self, repo_name, languages):
         """
         Analyzes repository structure and filters out generated code from language stats.
         """
         try:
+            # Validate repository name first
+            if not repo_name or not repo_name.strip():
+                print(f"Warning: Cannot filter generated code for invalid repository name")
+                return languages
+
             # Get repository structure
             repo_structure = self.analyze_repository_structure(repo_name)
             generated_patterns = self.config.get("exclusions", {}).get("generated_code_patterns", [])
@@ -329,6 +342,18 @@ class GitHubLanguageAnalyzer:
         import fnmatch
         return fnmatch.fnmatch(file_path, pattern)
 
+    def _is_repository_accessible(self, repo_name):
+        """
+        Checks if a repository is accessible (not private, not deleted, etc.)
+        """
+        try:
+            url = f"https://api.github.com/repos/{self.username}/{repo_name}"
+            response = self._make_github_request(url)
+            return response is not None and not response.get("private", False)
+        except Exception as e:
+            print(f"Warning: Could not check accessibility for {repo_name}: {e}")
+            return False
+
     def _get_gemini_code_quality_score(self, code_content):
         """
         Analyzes code content using the Gemini API and returns a quality score.
@@ -355,12 +380,20 @@ class GitHubLanguageAnalyzer:
         """
         Analyzes a repository's structure, files, and estimates code quality using Gemini.
         """
+        # Validate repository name
+        if not repo_name or not repo_name.strip():
+            print(f"Warning: Invalid repository name (empty or None), skipping analysis")
+            return self._get_fallback_repo_data("unknown")
+
+        repo_name = repo_name.strip()
         print(f"Analyzing repository structure for: {repo_name}")
+
         if self.use_simulation:
             return self._simulate_repository_analysis(repo_name)
 
         contents = self._get_repository_contents(repo_name)
         if not contents:
+            print(f"Warning: Could not fetch contents for {repo_name}, using fallback data")
             return self._get_fallback_repo_data(repo_name)
 
         total_files = 0
@@ -412,9 +445,14 @@ class GitHubLanguageAnalyzer:
         """
         Fetches repository contents recursively from the GitHub API.
         """
-        url = f"https://api.github.com/repos/{self.username}/{repo_name}/git/trees/main?recursive=1"
-        data = self._make_github_request(url)
-        if not data or 'tree' not in data:
+        try:
+            url = f"https://api.github.com/repos/{self.username}/{repo_name}/git/trees/main?recursive=1"
+            data = self._make_github_request(url)
+            if not data or 'tree' not in data:
+                print(f"Warning: Repository {repo_name} may be private, empty, or use a different default branch")
+                return []
+        except Exception as e:
+            print(f"Warning: Could not access repository {repo_name}: {e}")
             return []
 
         exclude_dirs = self.config.get("exclusions", {}).get("exclude_dirs", [])
@@ -742,6 +780,11 @@ class GitHubLanguageAnalyzer:
         for repo in self.repositories:
             repo_name = repo['name']
 
+            # Check if repository is accessible before analysis
+            if not self._is_repository_accessible(repo_name):
+                print(f"Skipping {repo_name} as it is private or inaccessible.")
+                continue
+
             # Fetch languages first to get a sense of the repo
             languages = self.fetch_repository_languages(repo_name)
             if not languages:
@@ -792,6 +835,11 @@ class GitHubLanguageAnalyzer:
         # Collect metrics for each language
         for result in analysis_results:
             repo_name = result.get("repository", "")
+
+            # Skip if repository name is invalid
+            if not repo_name or not repo_name.strip():
+                print(f"Warning: Skipping analysis for invalid repository name")
+                continue
 
             # Get commit data for this repository
             commit_data = self._get_repository_commits(repo_name)
@@ -866,10 +914,21 @@ class GitHubLanguageAnalyzer:
         """
         Fetches commit data for a repository to analyze contribution patterns.
         """
+        # Validate repository name
+        if not repo_name or not repo_name.strip():
+            print(f"Warning: Invalid repository name (empty or None)")
+            return []
+
+        repo_name = repo_name.strip()
+
         try:
             url = f"https://api.github.com/repos/{self.username}/{repo_name}/commits"
             params = {"author": self.username, "per_page": 100}
-            return self._make_github_request(url, params) or []
+            response = self._make_github_request(url, params)
+            if response is None:
+                print(f"Warning: Repository {repo_name} may be private or inaccessible")
+                return []
+            return response
         except Exception as e:
             print(f"Warning: Could not fetch commits for {repo_name}: {e}")
             return []
