@@ -3,7 +3,7 @@
 [github]
 username = "alessandrobrunoh"
 exclude_repos = ["repo1-to-exclude", "repo2-to-exclude", "Tokio-TCP-Chat-Test"]
-exclude_languages = ["CSS", "HTML", "SCSS", "Less"]
+exclude_languages = ["CSS", "HTML", "SCSS", "Less", "Jupyter Notebook"]
 exclude_generated_code = true
 min_commits_for_proficiency = 5
 min_lines_for_proficiency = 100

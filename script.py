@@ -621,69 +621,23 @@ class GitHubLanguageAnalyzer:
 
     def generate_tech_stack_markdown(self, detected_tech):
         """
-        Generates beautiful categorized Markdown for the detected technology stack.
+        Generates a clean, single-row markdown for the tech stack.
         """
         if not detected_tech:
             return ""
 
-        # Categorize technologies
-        categories = {
-            "🎨 Frontend": ["react", "vue", "angular", "next.js", "nuxt.js", "gatsby", "svelte", "tailwind"],
-            "⚙️ Backend": ["django", "flask", "spring", "express", "laravel", "rubyonrails", "fastapi"],
-            "☁️ Cloud & DevOps": ["docker", "kubernetes", "terraform", "ansible", "aws", "azure", "gcp"],
-            "🧪 Testing": ["jest", "pytest", "junit", "mocha", "cypress", "selenium"],
-            "🔧 Build Tools": ["webpack", "babel", "vite", "gulp", "grunt"],
-            "💾 Database": ["mongodb", "postgresql", "mysql", "redis", "elasticsearch"],
-            "🛠️ Tools": ["git", "github", "vscode", "intellij", "npm", "yarn"]
-        }
+        markdown = "## Tech Stack\n\n<div align=\"center\">\n"
 
-        markdown = """## 🚀 Technology Stack
+        # Sort and take top 15 technologies
+        sorted_tech = sorted(list(detected_tech))[:15]
 
-<div align="center">
-
-### 🛠️ What I Work With
-
-</div>
-
-"""
-
-        # Generate categorized sections
-        for category, tech_keys in categories.items():
-            category_techs = [tech for tech in detected_tech if tech in tech_keys]
-            if category_techs:
-                markdown += f"**{category}**\n\n<div align=\"center\">\n\n"
-
-                for tech_key in sorted(category_techs):
-                    if tech_key in self.tech_stack_mapping:
-                        display_name, icon_name = self.tech_stack_mapping[tech_key]
-                        badge = self._format_tech_badge(display_name, icon_name)
-                        markdown += f"{badge}\n"
-
-                markdown += "\n</div>\n\n"
-
-        # Add uncategorized technologies
-        uncategorized = []
-        all_categorized = [tech for techs in categories.values() for tech in techs]
-        for tech in detected_tech:
-            if tech not in all_categorized and tech in self.tech_stack_mapping:
-                uncategorized.append(tech)
-
-        if uncategorized:
-            markdown += "**🔧 Other Technologies**\n\n<div align=\"center\">\n\n"
-            for tech_key in sorted(uncategorized):
+        for tech_key in sorted_tech:
+            if tech_key in self.tech_stack_mapping:
                 display_name, icon_name = self.tech_stack_mapping[tech_key]
                 badge = self._format_tech_badge(display_name, icon_name)
                 markdown += f"{badge}\n"
-            markdown += "\n</div>\n\n"
 
-        markdown += """---
-
-<div align="center">
-  <img src="https://skillicons.dev/icons?i=""" + ",".join([self.tech_stack_mapping[tech][1] for tech in list(detected_tech)[:15] if tech in self.tech_stack_mapping]) + """" />
-</div>
-
-"""
-
+        markdown += "</div>\n"
         return markdown
 
     def _format_tech_badge(self, name, icon):
@@ -755,6 +709,134 @@ class GitHubLanguageAnalyzer:
             "total_lines": total_lines,
             "avg_quality_score": avg_quality_score,
         }
+
+    def fetch_contribution_activity(self):
+        """
+        Fetches the user's commit activity for the last year.
+        """
+        from datetime import datetime, timedelta
+
+        today = datetime.utcnow()
+        one_year_ago = today - timedelta(days=365)
+
+        activity = defaultdict(int)
+
+        for repo in self.repositories:
+            repo_name = repo['name']
+            print(f"Fetching commits for {repo_name}...")
+
+            url = f"https://api.github.com/repos/{self.username}/{repo_name}/commits"
+            params = {
+                "author": self.username,
+                "since": one_year_ago.isoformat(),
+                "per_page": 100
+            }
+
+            page = 1
+            while True:
+                params["page"] = page
+                commits = self._make_github_request(url, params=params)
+                if not commits:
+                    break
+
+                for commit in commits:
+                    try:
+                        commit_date_str = commit['commit']['author']['date']
+                        commit_date = datetime.fromisoformat(commit_date_str.replace('Z', '+00:00')).date()
+                        activity[commit_date] += 1
+                    except (KeyError, TypeError):
+                        continue
+
+                if len(commits) < 100:
+                    break
+                page += 1
+
+        return activity
+
+    def generate_contribution_svg(self, activity_data):
+        """
+        Generates an SVG for the contribution graph.
+        """
+        from datetime import datetime, timedelta
+
+        today = datetime.utcnow().date()
+        start_date = today - timedelta(days=364)
+
+        # SVG dimensions
+        width = 800
+        height = 120
+        box_size = 10
+        box_margin = 2
+
+        # Colors
+        colors = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
+
+        # Find max contributions for color scaling
+        max_contribs = max(activity_data.values()) if activity_data else 1
+
+        svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">'
+        svg += f'<style>.day {{ stroke: #1b1f23; stroke-width: 0.1; }}</style>'
+
+        # Month labels
+        month_labels = {}
+
+        # Draw squares for each day
+        for i in range(365):
+            date = start_date + timedelta(days=i)
+            week = i // 7
+            day_of_week = i % 7
+
+            x = week * (box_size + box_margin)
+            y = day_of_week * (box_size + box_margin)
+
+            contribs = activity_data.get(date, 0)
+
+            if contribs == 0:
+                color_index = 0
+            elif contribs == 1:
+                color_index = 1
+            elif contribs <= max_contribs * 0.4:
+                color_index = 2
+            elif contribs <= max_contribs * 0.7:
+                color_index = 3
+            else:
+                color_index = 4
+
+            color = colors[color_index]
+
+            svg += f'<rect x="{x}" y="{y}" width="{box_size}" height="{box_size}" fill="{color}" class="day" />'
+
+            # Store month labels
+            if date.day == 1:
+                month_labels[week] = date.strftime("%b")
+
+        # Add month labels to SVG
+        for week, month in month_labels.items():
+            x = week * (box_size + box_margin)
+            svg += f'<text x="{x}" y="{height - 5}" font-size="10" fill="#777">{month}</text>'
+
+        svg += '</svg>'
+        return svg
+
+    def generate_contribution_activity_md(self):
+        """
+        Generates the local contribution activity graph.
+        """
+        print("Fetching contribution activity...")
+        activity_data = self.fetch_contribution_activity()
+
+        print("Generating contribution SVG...")
+        svg_content = self.generate_contribution_svg(activity_data)
+
+        # Save SVG to file
+        with open("contribution_graph.svg", "w") as f:
+            f.write(svg_content)
+
+        return f"""## Contribution Activity
+<div align="center">
+  <img src="contribution_graph.svg" alt="Contribution Graph" />
+</div>
+"""
 
     def format_user_stats_markdown(self, user_stats):
         """
@@ -1047,202 +1129,77 @@ class GitHubLanguageAnalyzer:
         """
         return datetime.now(pytz.timezone("UTC")).strftime("%Y-%m-%d %H:%M:%S %Z")
 
-    def generate_profile_readme(self, ranking, user_stats, tech_stack_md):
+    def generate_profile_readme(self, ranking, user_stats, tech_stack_md, contribution_activity_md):
         """
-        Generates a beautiful, comprehensive README.md with enhanced visuals.
+        Generates the new, streamlined README.md.
         """
-        config = self.config.get("output", {})
-        use_emoji = config.get("use_emoji", True)
-        use_badges = config.get("use_badges", True)
-
-        # Header with animated typing effect
         readme = f"""<div align="center">
-
-# {f"👋 Hi, I'm {self.username}!" if use_emoji else f"Hi, I'm {self.username}!"}
-
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=22&pause=1000&color=2E9EF7&center=true&vCenter=true&width=440&lines=Welcome+to+my+GitHub+profile!;Passionate+Developer+%26+Problem+Solver;Always+learning+new+technologies" alt="Typing SVG" />
-
-![Profile Views](https://komarev.com/ghpvc/?username={self.username}&color=blue&style=flat-square)
-[![GitHub followers](https://img.shields.io/github/followers/{self.username}?style=social)](https://github.com/{self.username})
-
+# 👋 Hi, I'm {self.username}!
+*A passionate developer focused on creating elegant and effective solutions.*
 </div>
 
 ---
 
-## 📊 GitHub Analytics
-
-<div align="center">
-  <img height="180em" src="https://github-readme-stats.vercel.app/api?username={self.username}&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true"/>
-  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username={self.username}&layout=compact&langs_count=8&theme=tokyonight"/>
-</div>
-
-<div align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user={self.username}&theme=tokyonight" alt="GitHub Streak"/>
-</div>
+{self.generate_coding_proficiency_analysis_md(ranking, user_stats)}
 
 ---
 
+{tech_stack_md}
+
+---
+
+{contribution_activity_md}
+
+---
+
+<div align="center">
+<p>Last updated: {self.get_current_timestamp()}</p>
+</div>
+"""
+        return readme
+
+    def generate_coding_proficiency_analysis_md(self, ranking, user_stats):
+        """
+        Generates the redesigned 'Coding Proficiency Analysis' section.
+        """
+        if not ranking:
+            return "## Coding Proficiency Analysis\n\n*No language data available to display.*\n"
+
+        # Main stats
+        stats_md = f"""| Stat | Value |
+|---|---|
+| **Repositories Analyzed** | {user_stats.get('total_repos', 0)} |
+| **Total Lines of Code** | {user_stats.get('total_lines', 0):,} |
+| **Avg. Code Quality** | {user_stats.get('avg_quality_score', 0):.1f}% |
 """
 
-        # Enhanced stats and ranking in beautiful cards
-        readme += """<div align="center">
+        # Language ranking
+        ranking_md = """| Rank | Language | Usage | Proficiency |
+|---|---|---|---|
+"""
+        for i, item in enumerate(ranking[:5]): # Top 5
+            rank_emoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][i]
+            progress_bar = self._create_progress_bar(item['percentage'])
+            ranking_md += f"| {rank_emoji} | **{item['language']}** | `{progress_bar}` {item['percentage']:.1f}% | *{item['level']}* |\n"
 
-## 🎯 Coding Proficiency Analysis
 
-<table>
+        return f"""## Coding Proficiency Analysis
+
+table
 <tr>
-<td width="50%" valign="top">
+<td width="40%" valign="top">
 
-"""
-        readme += self._create_stats_card(user_stats)
-        readme += """
+{stats_md}
 
 </td>
-<td width="50%" valign="top">
+<td width="60%" valign="top">
 
-"""
-        readme += self._create_ranking_card(ranking)
-        readme += """
+{ranking_md}
 
 </td>
 </tr>
 </table>
-
-</div>
-
----
-
-"""
-
-        # Enhanced tech stack
-        readme += tech_stack_md
-
-        # Activity graph
-        readme += f"""---
-
-## 📈 Contribution Activity
-
-<div align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username={self.username}&theme=tokyo-night&bg_color=1a1b27&color=5aa2f7&line=f7df1e&point=ffffff&area=true&hide_border=true" width="100%"/>
-</div>
-
----
-
-## 🏆 GitHub Achievements
-
-<div align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username={self.username}&theme=tokyonight&no-frame=true&no-bg=true&margin-w=4&row=1" width="100%"/>
-</div>
-
----
-
-## 💡 Random Dev Quote
-
-<div align="center">
-  <img src="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight" />
-</div>
-
----
-
-## 🌟 What I'm Up To
-
-- 🔭 Currently working on innovative projects
-- 🌱 Always learning and exploring new technologies
-- 👯 Open to collaborating on exciting projects
-- 💬 Ask me about anything tech-related
-- ⚡ Fun fact: Code is poetry in motion!
-
----
-
-<div align="center">
-
-### 📫 Let's Connect!
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/{self.username})
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/{self.username})
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=google-chrome&logoColor=white)](https://{self.username}.dev)
-
----
-
-*{self.get_random_citation()}*
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer"/>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Made%20with-❤️-red.svg"/>
-  <img src="https://img.shields.io/badge/Last%20Updated-{self.get_current_timestamp().replace(' ', '%20').replace(':', '%3A')}-blue.svg"/>
-</p>
-
-</div>
-
-"""
-
-        return readme
-
-    def _create_stats_card(self, user_stats):
-        """
-        Creates a beautiful stats card with key metrics.
-        """
-        if not user_stats:
-            return "### 📊 Repository Stats\n\n*No stats available*"
-
-        total_repos = user_stats.get('total_repositories', 0)
-        total_languages = user_stats.get('total_languages', 0)
-        avg_quality = user_stats.get('average_quality_score', 0)
-
-        markdown = f"""### 📊 Repository Statistics
-
-<div align="center">
-
-| 🎯 Metric | 📈 Value |
-|-----------|----------|
-| **🗂️ Total Repositories** | `{total_repos}` |
-| **🔤 Languages Mastered** | `{total_languages}` |
-| **⭐ Avg Code Quality** | `{avg_quality:.1f}/100` |
-| **🚀 Years Active** | `{self._calculate_years_active()}+` |
-
-</div>
-
-**🎨 Quality Distribution:**
-```
-High Quality (80-100): ████████░░ {self._get_quality_distribution(avg_quality, 'high')}%
-Good Quality (60-79):  ██████░░░░ {self._get_quality_distribution(avg_quality, 'good')}%
-Needs Work (<60):      ████░░░░░░ {self._get_quality_distribution(avg_quality, 'low')}%
-```"""
-
-        return markdown
-
-    def _create_ranking_card(self, ranking):
-        """
-        Creates a beautiful ranking card with language proficiency.
-        """
-        if not ranking:
-            return "### 🏆 Language Proficiency\n\n*No language data available*"
-
-        markdown = """### 🏆 Language Proficiency
-
-<div align="center">
-
-| 🥇 Rank | 💻 Language | 📊 Usage | 🎯 Proficiency |
-|---------|-------------|----------|----------------|"""
-
-        for i, item in enumerate(ranking[:8]):  # Top 8 languages
-            rank_emoji = ["🥇", "🥈", "🥉"][i] if i < 3 else f"#{item['rank']}"
-            progress_bar = self._create_progress_bar(item['percentage'])
-            markdown += f"\n| {rank_emoji} | **{item['language']}** | {progress_bar} {item['percentage']:.1f}% | {item['level']} |"
-
-        markdown += "\n\n</div>\n\n"
-
-        # Add language badges
-        markdown += "**🚀 Tech Arsenal:**\n\n<div align=\"center\">\n\n"
-        for item in ranking[:6]:
-            lang = item['language'].lower()
-            color = self._get_language_color(lang)
-            markdown += f"![{item['language']}](https://img.shields.io/badge/{item['language'].replace(' ', '%20')}-{item['percentage']:.1f}%25-{color}?style=flat-square&logo={self._get_language_logo(lang)}&logoColor=white)\n"
-
-        markdown += "\n</div>"
-
-        return markdown
+"
 
     def _create_progress_bar(self, percentage, length=10):
         """
@@ -1355,6 +1312,7 @@ def main():
 
         # 3. Calculate language percentages and proficiency
         percentages = analyzer.calculate_percentages(analysis_results)
+        user_stats['total_languages'] = len(percentages)
         proficiency = analyzer.calculate_language_proficiency(analysis_results)
 
         # 4. Generate language ranking
@@ -1364,8 +1322,11 @@ def main():
         detected_tech = analyzer.detect_frameworks_from_repos(analysis_results)
         tech_stack_md = analyzer.generate_tech_stack_markdown(detected_tech)
 
-        # 6. Generate the full README content
-        readme_content = analyzer.generate_profile_readme(ranking, user_stats, tech_stack_md)
+        # 6. Generate contribution activity graph (placeholder)
+        contribution_activity_md = analyzer.generate_contribution_activity_md()
+
+        # 7. Generate the full README content
+        readme_content = analyzer.generate_profile_readme(ranking, user_stats, tech_stack_md, contribution_activity_md)
 
         # 7. Write to file
         with open("PROFILE_README.md", "w", encoding="utf-8") as f:
