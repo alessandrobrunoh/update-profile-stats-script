@@ -185,19 +185,21 @@ class GitHubLanguageAnalyzer:
             print("Simulation mode: Using mock repository data.")
             return [{"name": f"sim-repo-{i}", "fork": False, "languages_url": ""} for i in range(5)]
 
-        print(f"Fetching repositories for user: {self.username}")
+        print(f"Fetching last 100 repositories for user: {self.username}")
         repos = []
         page = 1
         while True:
             url = f"https://api.github.com/users/{self.username}/repos"
-            params = {"per_page": 100, "page": page}
+            params = {"per_page": 100, "page": page, "sort": "pushed", "direction": "desc"}
             page_repos = self._make_github_request(url, params=params)
             if not page_repos:
                 break
             repos.extend(page_repos)
-            if len(page_repos) < 100:
+            if len(repos) >= 100 or len(page_repos) < 100:
                 break
             page += 1
+
+        repos = repos[:100]
 
         exclude_repos = self.config.get("github", {}).get("exclude_repos", [])
         self.repositories = [repo for repo in repos if not repo['fork'] and repo['name'] not in exclude_repos]
@@ -493,6 +495,44 @@ class GitHubLanguageAnalyzer:
         """
         return os.path.basename(file_path) in exclude_list
 
+    def _ai_summarize_repository(self, repo_name):
+        """
+        Uses Gemini to generate a one-sentence summary of a repository.
+        """
+        print(f"Generating AI summary for {repo_name}...")
+
+        contents = self._get_repository_contents(repo_name)
+        if not contents:
+            return "A project by this user."
+
+        readme_content = ""
+        for item in contents:
+            if item['path'].lower() == 'readme.md':
+                readme_content = self._get_file_content(item['url'])
+                break
+
+        file_list = "\n".join([f"- {item['path']}" for item in contents[:20]])
+
+        prompt = f"""Analyze the following repository structure and README to generate a concise, one-sentence summary of the project's purpose.
+
+**Repository Name:** {repo_name}
+
+**File Structure:**
+{file_list}
+
+**README:**
+{readme_content[:1000]}
+
+**Summary (one sentence):**
+"""
+
+        try:
+            response = self.gemini_model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            print(f"AI summary generation failed for {repo_name}: {e}")
+            return "A project by this user."
+
     def _get_fallback_repo_data(self, repo_name):
         """
         Provides fallback data for a repository that couldn't be analyzed.
@@ -619,25 +659,48 @@ class GitHubLanguageAnalyzer:
 
         return list(detected_tech)
 
-    def generate_tech_stack_markdown(self, detected_tech):
+    def generate_project_showcase_md(self, analysis_results):
         """
-        Generates a clean, single-row markdown for the tech stack.
+        Generates a markdown showcase for the top projects.
         """
-        if not detected_tech:
+        if not analysis_results:
             return ""
 
-        markdown = "## Tech Stack\n\n<div align=\"center\">\n"
+        markdown = "## 🚀 Project Showcase
 
-        # Sort and take top 15 technologies
-        sorted_tech = sorted(list(detected_tech))[:15]
+"
 
-        for tech_key in sorted_tech:
-            if tech_key in self.tech_stack_mapping:
-                display_name, icon_name = self.tech_stack_mapping[tech_key]
-                badge = self._format_tech_badge(display_name, icon_name)
-                markdown += f"{badge}\n"
+        # Select top 3 projects by total lines of code
+        sorted_repos = sorted(analysis_results, key=lambda x: x.get('total_lines', 0), reverse=True)
 
-        markdown += "</div>\n"
+        for repo_analysis in sorted_repos[:3]:
+            repo_name = repo_analysis['repo_name']
+
+            summary = self._ai_summarize_repository(repo_name)
+
+            languages = repo_analysis.get('languages', {})
+            detected_tech = self.detect_frameworks_from_repos([repo_analysis])
+
+            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})
+"
+            markdown += f"*{summary}*
+
+"
+
+            markdown += "<p>"
+            for lang in languages:
+                badge = self._format_tech_badge(lang, self._get_language_logo(lang))
+                markdown += f"{badge} "
+
+            for tech_key in detected_tech:
+                if tech_key in self.tech_stack_mapping:
+                    display_name, icon_name = self.tech_stack_mapping[tech_key]
+                    badge = self._format_tech_badge(display_name, icon_name)
+                    markdown += f"{badge} "
+            markdown += "</p>
+
+"
+
         return markdown
 
     def _format_tech_badge(self, name, icon):
@@ -1318,15 +1381,14 @@ def main():
         # 4. Generate language ranking
         ranking = analyzer.generate_ranking(percentages, proficiency)
 
-        # 5. Detect tech stack
-        detected_tech = analyzer.detect_frameworks_from_repos(analysis_results)
-        tech_stack_md = analyzer.generate_tech_stack_markdown(detected_tech)
+        # 5. Generate Project Showcase
+        project_showcase_md = analyzer.generate_project_showcase_md(analysis_results)
 
         # 6. Generate contribution activity graph (placeholder)
         contribution_activity_md = analyzer.generate_contribution_activity_md()
 
         # 7. Generate the full README content
-        readme_content = analyzer.generate_profile_readme(ranking, user_stats, tech_stack_md, contribution_activity_md)
+        readme_content = analyzer.generate_profile_readme(ranking, user_stats, project_showcase_md, contribution_activity_md)
 
         # 7. Write to file
         with open("PROFILE_README.md", "w", encoding="utf-8") as f:
