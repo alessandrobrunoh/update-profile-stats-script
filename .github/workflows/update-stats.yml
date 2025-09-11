@@ -201,34 +201,29 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-          echo "🔄 Fetching latest remote changes..."
-          git fetch origin main
+          echo "Stashing changes to avoid conflicts..."
+          git stash
 
-          echo "🔀 Rebasing local changes on top of remote..."
-          git rebase origin/main || {
-            echo "⚠️ Rebase conflict detected, resolving automatically..."
-            git rebase --abort
-            git reset --hard origin/main
-          }
+          echo "Pulling latest changes from remote..."
+          git pull --rebase
 
-          echo "📄 Copying PROFILE_README.md to README.md..."
+          echo "Applying stashed changes..."
+          git stash pop
+
+          echo "Copying generated profile to README..."
           cp PROFILE_README.md README.md
 
-          echo "➕ Adding files to git..."
-          git add PROFILE_README.md README.md
+          echo "Adding all changes to git..."
+          git add PROFILE_README.md README.md config.toml
 
-          echo "💾 Committing changes..."
+          echo "Committing changes..."
           git commit -m "🤖 Update profile stats - $(date -u '+%Y-%m-%d %H:%M UTC')" || {
-            echo "ℹ️ No changes to commit"
+            echo "No changes to commit."
             exit 0
           }
 
-          echo "🚀 Pushing changes..."
-          git push origin main || {
-            echo "⚠️ Push failed, trying force push..."
-            git push --force-with-lease origin main
-          }
-          echo "✅ Changes committed and pushed successfully"
+          echo "Pushing changes to remote..."
+          git push
 
       - name: No changes to commit
         if: steps.verify-changed-files.outputs.changes_detected == 'false'
