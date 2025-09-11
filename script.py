@@ -664,11 +664,9 @@ class GitHubLanguageAnalyzer:
         Generates a markdown showcase for the top projects.
         """
         if not analysis_results:
-            return ""
+            return ''
 
-        markdown = "## 🚀 Project Showcase
-
-"
+        markdown = '## 🚀 Project Showcase\n\n'
 
         # Select top 3 projects by total lines of code
         sorted_repos = sorted(analysis_results, key=lambda x: x.get('total_lines', 0), reverse=True)
@@ -681,13 +679,10 @@ class GitHubLanguageAnalyzer:
             languages = repo_analysis.get('languages', {})
             detected_tech = self.detect_frameworks_from_repos([repo_analysis])
 
-            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})
-"
-            markdown += f"*{summary}*
+            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})\n"
+            markdown += f"*{summary}*\n\n"
 
-"
-
-            markdown += "<p>"
+            markdown += '<p>'
             for lang in languages:
                 badge = self._format_tech_badge(lang, self._get_language_logo(lang))
                 markdown += f"{badge} "
@@ -697,9 +692,7 @@ class GitHubLanguageAnalyzer:
                     display_name, icon_name = self.tech_stack_mapping[tech_key]
                     badge = self._format_tech_badge(display_name, icon_name)
                     markdown += f"{badge} "
-            markdown += "</p>
-
-"
+            markdown += '</p>\n\n'
 
         return markdown
 
