@@ -201,6 +201,16 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
+          echo "🔄 Fetching latest remote changes..."
+          git fetch origin main
+
+          echo "🔀 Rebasing local changes on top of remote..."
+          git rebase origin/main || {
+            echo "⚠️ Rebase conflict detected, resolving automatically..."
+            git rebase --abort
+            git reset --hard origin/main
+          }
+
           echo "📄 Copying PROFILE_README.md to README.md..."
           cp PROFILE_README.md README.md
 
@@ -208,10 +218,16 @@ jobs:
           git add PROFILE_README.md README.md
 
           echo "💾 Committing changes..."
-          git commit -m "🤖 Update profile stats - $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git commit -m "🤖 Update profile stats - $(date -u '+%Y-%m-%d %H:%M UTC')" || {
+            echo "ℹ️ No changes to commit"
+            exit 0
+          }
 
           echo "🚀 Pushing changes..."
-          git push
+          git push origin main || {
+            echo "⚠️ Push failed, trying force push..."
+            git push --force-with-lease origin main
+          }
           echo "✅ Changes committed and pushed successfully"
 
       - name: No changes to commit
