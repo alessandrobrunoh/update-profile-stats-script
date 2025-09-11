@@ -15,7 +15,6 @@ def ensure_dependencies():
         ("requests>=2.31.0", "requests"),
         ("tomli>=2.0.0", "tomli"),
         ("python-dotenv>=1.0.0", "dotenv"),
-        ("google-generativeai>=0.3.0", "google.generativeai"),
         ("pytz>=2023.3", "pytz")
     ]
 
@@ -81,7 +80,7 @@ import pytz
 import requests
 import tomli
 from dotenv import load_dotenv
-import google.generativeai as genai
+from dotenv import load_dotenv
 
 # Load environment variables from .env file at the start
 load_dotenv()
@@ -109,7 +108,6 @@ class GitHubLanguageAnalyzer:
         else:
             print("⚠️ Could not detect GitHub username. Using default.")
         self.github_token = os.getenv("GITHUB_TOKEN")
-        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.use_simulation = use_simulation
 
         self.headers = {
@@ -123,14 +121,6 @@ class GitHubLanguageAnalyzer:
 
         if not self.github_token:
             print("Warning: GITHUB_TOKEN environment variable not set. API requests may be rate-limited.")
-
-        if not self.gemini_api_key:
-            raise ValueError("GEMINI_API_KEY environment variable not set. It's required for code analysis.")
-
-        # Configure the Gemini client
-        genai.configure(api_key=self.gemini_api_key)  # type: ignore
-        gemini_model_name = self.config.get("gemini", {}).get("model", "gemini-1.5-flash")
-        self.gemini_model = genai.GenerativeModel(gemini_model_name)  # type: ignore
 
     def load_config(self, config_path="config.toml"):
         """
@@ -295,28 +285,11 @@ class GitHubLanguageAnalyzer:
             if pattern.lower() in content_lower:
                 return True
 
-        # Use AI to detect generated code patterns
-        if len(content) > 100:  # Only for substantial files
-            return self._ai_detect_generated_code(content[:2000])  # First 2KB
+        # AI detection removed.
 
         return False
 
-    def _ai_detect_generated_code(self, code_content):
-        """
-        Uses AI to detect if code appears to be auto-generated.
-        """
-        try:
-            prompt = self.config.get("gemini", {}).get("generated_code_prompt", "")
-            if not prompt:
-                return False
 
-            full_prompt = f"{prompt}\n\nCode:\n{code_content}"
-            response = self.gemini_model.generate_content(full_prompt)
-            result = response.text.strip().upper()
-            return "GENERATED" in result
-        except Exception as e:
-            print(f"Warning: AI generated code detection failed: {e}")
-            return False
 
     def _detect_file_language(self, file_path):
         """
@@ -355,27 +328,7 @@ class GitHubLanguageAnalyzer:
             print(f"Warning: Could not check accessibility for {repo_name}: {e}")
             return False
 
-    def _get_gemini_code_quality_score(self, code_content):
-        """
-        Analyzes code content using the Gemini API and returns a quality score.
-        """
-        if not code_content or code_content.isspace():
-            return 0
 
-        prompt_template = self.config.get("gemini", {}).get("prompt", "Analyze this code and give a quality score from 0 to 100.")
-        full_prompt = f"{prompt_template}\n\n--- CODE ---\n{code_content}"
-
-        try:
-            response = self.gemini_model.generate_content(full_prompt)
-            # Extract the score, assuming the API returns just the number as requested.
-            score_text = ''.join(filter(str.isdigit, response.text))
-            if not score_text:
-                return 0
-            score = int(score_text)
-            return max(0, min(100, score)) # Clamp score between 0 and 100
-        except Exception as e:
-            print(f"An error occurred while calling Gemini API: {e}")
-            return 0 # Return a default score on error
 
     def analyze_repository_structure(self, repo_name):
         """
@@ -416,10 +369,8 @@ class GitHubLanguageAnalyzer:
                     lines = file_content.count('\n') + 1
                     total_lines += lines
 
-                    # Use Gemini for quality score
-                    quality_score = self._get_gemini_code_quality_score(file_content)
-                    quality_scores.append(quality_score)
-                    time.sleep(1) # Add a small delay to avoid hitting API rate limits
+                    # AI quality score removed.
+                    quality_scores.append(0) # Append a default value
 
         # Calculate overall quality from Gemini scores
         overall_quality_score = sum(quality_scores) / len(quality_scores) if quality_scores else 0
@@ -494,43 +445,7 @@ class GitHubLanguageAnalyzer:
         """
         return os.path.basename(file_path) in exclude_list
 
-    def _ai_summarize_repository(self, repo_name):
-        """
-        Uses Gemini to generate a one-sentence summary of a repository.
-        """
-        print(f"Generating AI summary for {repo_name}...")
 
-        contents = self._get_repository_contents(repo_name)
-        if not contents:
-            return "A project by this user."
-
-        readme_content = ""
-        for item in contents:
-            if item['path'].lower() == 'readme.md':
-                readme_content = self._get_file_content(item['url'])
-                break
-
-        file_list = "\n".join([f"- {item['path']}" for item in contents[:20]])
-
-        prompt = f"""Analyze the following repository structure and README to generate a concise, one-sentence summary of the project's purpose.
-
-**Repository Name:** {repo_name}
-
-**File Structure:**
-{file_list}
-
-**README:**
-{readme_content[:1000]}
-
-**Summary (one sentence):**
-"""
-
-        try:
-            response = self.gemini_model.generate_content(prompt)
-            return response.text.strip()
-        except Exception as e:
-            print(f"AI summary generation failed for {repo_name}: {e}")
-            return "A project by this user."
 
     def _get_fallback_repo_data(self, repo_name):
         """
@@ -658,40 +573,34 @@ class GitHubLanguageAnalyzer:
 
         return list(detected_tech)
 
-    def generate_project_showcase_md(self, analysis_results):
+    def generate_tech_stack_markdown(self, analysis_results):
         """
-        Generates a markdown showcase for the top projects.
+        Generates a categorized and colorful markdown for the tech stack.
         """
-        if not analysis_results:
-            return ''
+        detected_tech = self.detect_frameworks_from_repos(analysis_results)
+        if not detected_tech:
+            return ""
 
-        markdown = '## 🚀 Project Showcase\n\n'
+        categories = {
+            "🎨 Frontend": ["react", "vue", "angular", "next.js", "nuxt.js", "gatsby", "svelte", "tailwind", "html", "css"],
+            "⚙️ Backend": ["django", "flask", "spring", "express", "laravel", "rubyonrails", "fastapi", "python", "java", "go", "rust", "php", "ruby"],
+            "☁️ DevOps & Cloud": ["docker", "kubernetes", "terraform", "ansible", "aws", "azure", "gcp", "jenkins", "github actions", "gitlab"],
+            "💾 Databases": ["mongodb", "postgresql", "mysql", "sqlite", "redis"],
+            "🧪 Testing": ["jest", "pytest", "junit", "mocha", "cypress", "selenium"],
+        }
 
-        # Select top 3 projects by total lines of code
-        sorted_repos = sorted(analysis_results, key=lambda x: x.get('total_lines', 0), reverse=True)
+        markdown = "## 💻 Tech Stack\n\n"
 
-        for repo_analysis in sorted_repos[:3]:
-            repo_name = repo_analysis['repo_name']
-
-            summary = self._ai_summarize_repository(repo_name)
-
-            languages = repo_analysis.get('languages', {})
-            detected_tech = self.detect_frameworks_from_repos([repo_analysis])
-
-            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})\n"
-            markdown += f"*{summary}*\n\n"
-
-            markdown += '<p>'
-            for lang in languages:
-                badge = self._format_tech_badge(lang, self._get_language_logo(lang))
-                markdown += f"{badge} "
-
-            for tech_key in detected_tech:
-                if tech_key in self.tech_stack_mapping:
-                    display_name, icon_name = self.tech_stack_mapping[tech_key]
-                    badge = self._format_tech_badge(display_name, icon_name)
-                    markdown += f"{badge} "
-            markdown += '</p>\n\n'
+        for category, tech_keys in categories.items():
+            category_techs = [tech for tech in detected_tech if tech in tech_keys]
+            if category_techs:
+                markdown += f"**{category}**\n\n<p>"
+                for tech_key in sorted(category_techs):
+                    if tech_key in self.tech_stack_mapping:
+                        display_name, icon_name = self.tech_stack_mapping[tech_key]
+                        badge = self._format_tech_badge(display_name, icon_name)
+                        markdown += f"{badge} "
+                markdown += "</p>\n"
 
         return markdown
 
@@ -958,70 +867,40 @@ class GitHubLanguageAnalyzer:
 
     def calculate_language_proficiency(self, analysis_results):
         """
-        Calculates enhanced proficiency score for each language based on multiple factors.
+        Calculates proficiency score based on quantitative metrics.
         """
         lang_metrics = defaultdict(lambda: {
             'total_lines': 0,
             'total_commits': 0,
             'repositories': set(),
-            'quality_scores': [],
-            'complexity_scores': [],
-            'ai_proficiency_scores': []
         })
 
         # Collect metrics for each language
         for result in analysis_results:
             repo_name = result.get("repo_name", "")
-
-            # Skip if repository name is invalid
-            if not repo_name or not repo_name.strip():
-                print(f"Warning: Skipping analysis for invalid repository name")
+            if not repo_name:
                 continue
 
-            # Get commit data for this repository
             commit_data = self._get_repository_commits(repo_name)
 
             for lang, lines in result.get("languages", {}).items():
                 if lines > 0:
                     metrics = lang_metrics[lang]
-
-                    # Lines of code
                     metrics['total_lines'] += lines
-
-                    # Repository count
                     metrics['repositories'].add(repo_name)
-
-                    # Quality scores
-                    quality = result.get("overall_quality_score", 0)
-                    if quality > 0:
-                        metrics['quality_scores'].append(quality)
-
-                    # Commit analysis for this language in this repo
-                    lang_commits = self._analyze_language_commits(commit_data, lang)
-                    metrics['total_commits'] += lang_commits
-
-                    # AI-powered proficiency assessment
-                    code_samples = self._get_language_code_samples(result, lang)
-                    if code_samples:
-                        ai_score = self._ai_assess_language_proficiency(code_samples, lang)
-                        if ai_score > 0:
-                            metrics['ai_proficiency_scores'].append(ai_score)
+                    metrics['total_commits'] += self._analyze_language_commits(commit_data, lang)
 
         # Calculate final proficiency scores
         proficiency = {}
-        config_weights = self.config.get("proficiency", {})
-
-        commits_weight = config_weights.get("commits_weight", 0.3)
-        lines_weight = config_weights.get("lines_of_code_weight", 0.25)
-        quality_weight = config_weights.get("code_quality_weight", 0.25)
-        repo_weight = config_weights.get("repository_count_weight", 0.1)
-        complexity_weight = config_weights.get("complexity_weight", 0.1)
+        # New simplified weights (can be moved to config)
+        commits_weight = 0.4
+        lines_weight = 0.3
+        repo_weight = 0.3
 
         min_commits = self.config.get("github", {}).get("min_commits_for_proficiency", 5)
         min_lines = self.config.get("github", {}).get("min_lines_for_proficiency", 100)
 
         for lang, metrics in lang_metrics.items():
-            # Skip languages with insufficient activity
             if metrics['total_commits'] < min_commits or metrics['total_lines'] < min_lines:
                 continue
 
@@ -1030,17 +909,11 @@ class GitHubLanguageAnalyzer:
             lines_score = min(100, (metrics['total_lines'] / 10000) * 100)  # 10k+ lines = 100
             repo_score = min(100, (len(metrics['repositories']) / 10) * 100)  # 10+ repos = 100
 
-            # Average quality and AI scores
-            avg_quality = sum(metrics['quality_scores']) / len(metrics['quality_scores']) if metrics['quality_scores'] else 50
-            avg_ai_score = sum(metrics['ai_proficiency_scores']) / len(metrics['ai_proficiency_scores']) if metrics['ai_proficiency_scores'] else 50
-
             # Combined proficiency score
             final_score = (
                 commit_score * commits_weight +
                 lines_score * lines_weight +
-                avg_quality * quality_weight +
-                repo_score * repo_weight +
-                avg_ai_score * complexity_weight
+                repo_score * repo_weight
             )
 
             proficiency[lang] = min(100, final_score)
@@ -1095,36 +968,7 @@ class GitHubLanguageAnalyzer:
                     break
         return samples
 
-    def _ai_assess_language_proficiency(self, code_samples, language):
-        """
-        Uses AI to assess proficiency level based on code samples.
-        """
-        try:
-            if not code_samples:
-                return 0
 
-            prompt_template = self.config.get("gemini", {}).get("proficiency_prompt", "")
-            if not prompt_template:
-                return 0
-
-            # Combine samples for analysis
-            combined_code = "\n\n--- Sample ---\n\n".join(code_samples)
-            full_prompt = prompt_template.format(language=language) + f"\n\nCode samples:\n{combined_code}"
-
-            response = self.gemini_model.generate_content(full_prompt)
-            result = response.text.strip()
-
-            # Extract numeric score (1-10)
-            import re
-            score_match = re.search(r'\b([1-9]|10)\b', result)
-            if score_match:
-                score = int(score_match.group(1))
-                return score * 10  # Convert to 0-100 scale
-
-            return 0
-        except Exception as e:
-            print(f"Warning: AI proficiency assessment failed for {language}: {e}")
-            return 0
 
     def get_proficiency_level_description(self, score):
         """
@@ -1238,23 +1082,7 @@ class GitHubLanguageAnalyzer:
             ranking_md += f"| {rank_emoji} | **{item['language']}** | `{progress_bar}` {item['percentage']:.1f}% | *{item['level']}* |\n"
 
 
-        return f"""## Coding Proficiency Analysis
-
-<table>
-<tr>
-<td width=\"40%\" valign=\"top">
-
-{stats_md}
-
-</td>
-<td width=\"60%\" valign=\"top">
-
-{ranking_md}
-
-</td>
-</tr>
-</table>
-"""
+        return f"""## Coding Proficiency Analysis\n\n<table>\n<tr>\n<td width=\"40%\" valign=\"top">\n\n{stats_md}\n\n</td>\n<td width=\"60%\" valign=\"top">\n\n{ranking_md}\n\n</td>\n</tr>\n</table>\n\n<details>\n<summary>How is proficiency calculated?</summary>\nProficiency is a weighted score based on commit frequency, volume of code, and the number of repositories a language is used in. It does not use AI analysis.\n</details>\n"""
 
     def _create_progress_bar(self, percentage, length=10):
         """
@@ -1373,14 +1201,14 @@ def main():
         # 4. Generate language ranking
         ranking = analyzer.generate_ranking(percentages, proficiency)
 
-        # 5. Generate Project Showcase
-        project_showcase_md = analyzer.generate_project_showcase_md(analysis_results)
+        # 5. Generate Tech Stack
+        tech_stack_md = analyzer.generate_tech_stack_markdown(analysis_results)
 
         # 6. Generate contribution activity graph (placeholder)
         contribution_activity_md = analyzer.generate_contribution_activity_md()
 
         # 7. Generate the full README content
-        readme_content = analyzer.generate_profile_readme(ranking, user_stats, project_showcase_md, contribution_activity_md)
+        readme_content = analyzer.generate_profile_readme(ranking, user_stats, tech_stack_md, contribution_activity_md)
 
         # 7. Write to file
         with open("PROFILE_README.md", "w", encoding="utf-8") as f:
