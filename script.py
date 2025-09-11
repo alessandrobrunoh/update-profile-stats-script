@@ -4,6 +4,8 @@ import subprocess
 import time
 import base64
 import random
+import json
+import google.generativeai as genai
 from collections import defaultdict
 from datetime import datetime
 
@@ -15,6 +17,7 @@ def ensure_dependencies():
         ("requests>=2.31.0", "requests"),
         ("tomli>=2.0.0", "tomli"),
         ("python-dotenv>=1.0.0", "dotenv"),
+        ("google-generativeai>=0.3.0", "google.generativeai"),
         ("pytz>=2023.3", "pytz")
     ]
 
@@ -108,6 +111,7 @@ class GitHubLanguageAnalyzer:
         else:
             print("⚠️ Could not detect GitHub username. Using default.")
         self.github_token = os.getenv("GITHUB_TOKEN")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.use_simulation = use_simulation
 
         self.headers = {
@@ -118,9 +122,35 @@ class GitHubLanguageAnalyzer:
         self.repositories = []
         self.repo_cache = {}
         self.tech_stack_mapping = self.get_tech_stack_mapping()
+        self.ai_cache = self.load_ai_cache()
 
         if not self.github_token:
             print("Warning: GITHUB_TOKEN environment variable not set. API requests may be rate-limited.")
+
+        if not self.gemini_api_key:
+            print("Warning: GEMINI_API_KEY not set. AI-based summaries will be disabled.")
+            self.gemini_model = None
+        else:
+            genai.configure(api_key=self.gemini_api_key)
+            gemini_model_name = self.config.get("gemini", {}).get("model", "gemini-1.5-flash")
+            self.gemini_model = genai.GenerativeModel(gemini_model_name)
+
+    def load_ai_cache(self, cache_path="ai_cache.json"):
+        """
+        Loads the AI summary cache from a JSON file.
+        """
+        try:
+            with open(cache_path, "r") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {}
+
+    def save_ai_cache(self, cache_path="ai_cache.json"):
+        """
+        Saves the AI summary cache to a JSON file.
+        """
+        with open(cache_path, "w") as f:
+            json.dump(self.ai_cache, f, indent=4)
 
     def load_config(self, config_path="config.toml"):
         """
@@ -416,6 +446,16 @@ class GitHubLanguageAnalyzer:
         ]
         return filtered_tree
 
+    def _get_latest_commit_sha(self, repo_name):
+        """
+        Gets the latest commit SHA for a repository's default branch.
+        """
+        url = f"https://api.github.com/repos/{self.username}/{repo_name}/branches/main" # Assumes main branch
+        data = self._make_github_request(url)
+        if data and 'commit' in data and 'sha' in data['commit']:
+            return data['commit']['sha']
+        return None
+
     def _get_file_content(self, file_url):
         """
         Retrieves the content of a file from its API URL.
@@ -438,6 +478,61 @@ class GitHubLanguageAnalyzer:
             "total_lines": random.randint(1000, 10000),
             "overall_quality_score": random.uniform(60, 95),
         }
+
+    def _ai_summarize_repository(self, repo_name):
+        """
+        Uses Gemini to generate a one-sentence summary of a repository, with caching.
+        """
+        if not self.gemini_model:
+            return "An open-source project."
+
+        latest_sha = self._get_latest_commit_sha(repo_name)
+        if not latest_sha:
+            return "An open-source project."
+
+        # Check cache
+        if self.ai_cache.get(repo_name, {}).get('sha') == latest_sha:
+            print(f"Using cached summary for {repo_name}")
+            return self.ai_cache[repo_name]['summary']
+
+        print(f"Generating new AI summary for {repo_name}...")
+
+        contents = self._get_repository_contents(repo_name)
+        if not contents:
+            return "An open-source project."
+
+        readme_content = ""
+        for item in contents:
+            if item['path'].lower() == 'readme.md':
+                readme_content = self._get_file_content(item['url'])
+                break
+
+        file_list = "\n".join([f"- {item['path']}" for item in contents[:20]])
+
+        prompt = f"""Analyze the following repository structure and README to generate a concise, one-sentence summary of the project's purpose.
+
+**Repository Name:** {repo_name}
+
+**File Structure:**
+{file_list}
+
+**README:**
+{readme_content[:1000]}
+
+**Summary (one sentence):**
+"""
+
+        try:
+            response = self.gemini_model.generate_content(prompt)
+            summary = response.text.strip()
+
+            # Update cache
+            self.ai_cache[repo_name] = {'sha': latest_sha, 'summary': summary}
+
+            return summary
+        except Exception as e:
+            print(f"AI summary generation failed for {repo_name}: {e}")
+            return "An open-source project."
 
     def _should_exclude_file(self, file_path, exclude_list):
         """
@@ -573,34 +668,40 @@ class GitHubLanguageAnalyzer:
 
         return list(detected_tech)
 
-    def generate_tech_stack_markdown(self, analysis_results):
+    def generate_project_showcase_md(self, analysis_results):
         """
-        Generates a categorized and colorful markdown for the tech stack.
+        Generates a markdown showcase for the top projects with AI summaries.
         """
-        detected_tech = self.detect_frameworks_from_repos(analysis_results)
-        if not detected_tech:
+        if not analysis_results:
             return ""
 
-        categories = {
-            "🎨 Frontend": ["react", "vue", "angular", "next.js", "nuxt.js", "gatsby", "svelte", "tailwind", "html", "css"],
-            "⚙️ Backend": ["django", "flask", "spring", "express", "laravel", "rubyonrails", "fastapi", "python", "java", "go", "rust", "php", "ruby"],
-            "☁️ DevOps & Cloud": ["docker", "kubernetes", "terraform", "ansible", "aws", "azure", "gcp", "jenkins", "github actions", "gitlab"],
-            "💾 Databases": ["mongodb", "postgresql", "mysql", "sqlite", "redis"],
-            "🧪 Testing": ["jest", "pytest", "junit", "mocha", "cypress", "selenium"],
-        }
+        markdown = "## 🚀 Project Showcase\n\n"
 
-        markdown = "## 💻 Tech Stack\n\n"
+        # Select top 3 projects by total lines of code
+        sorted_repos = sorted(analysis_results, key=lambda x: x.get('total_lines', 0), reverse=True)
 
-        for category, tech_keys in categories.items():
-            category_techs = [tech for tech in detected_tech if tech in tech_keys]
-            if category_techs:
-                markdown += f"**{category}**\n\n<p>"
-                for tech_key in sorted(category_techs):
-                    if tech_key in self.tech_stack_mapping:
-                        display_name, icon_name = self.tech_stack_mapping[tech_key]
-                        badge = self._format_tech_badge(display_name, icon_name)
-                        markdown += f"{badge} "
-                markdown += "</p>\n"
+        for repo_analysis in sorted_repos[:3]:
+            repo_name = repo_analysis['repo_name']
+
+            summary = self._ai_summarize_repository(repo_name)
+
+            languages = repo_analysis.get('languages', {})
+            detected_tech = self.detect_frameworks_from_repos([repo_analysis])
+
+            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})\n"
+            markdown += f"*{summary}*\n\n"
+
+            markdown += "<p>"
+            for lang in languages:
+                badge = self._format_tech_badge(lang, self._get_language_logo(lang))
+                markdown += f"{badge} "
+
+            for tech_key in detected_tech:
+                if tech_key in self.tech_stack_mapping:
+                    display_name, icon_name = self.tech_stack_mapping[tech_key]
+                    badge = self._format_tech_badge(display_name, icon_name)
+                    markdown += f"{badge} "
+            markdown += "</p>\n\n"
 
         return markdown
 
@@ -1201,18 +1302,20 @@ def main():
         # 4. Generate language ranking
         ranking = analyzer.generate_ranking(percentages, proficiency)
 
-        # 5. Generate Tech Stack
-        tech_stack_md = analyzer.generate_tech_stack_markdown(analysis_results)
+        # 5. Generate Project Showcase
+        project_showcase_md = analyzer.generate_project_showcase_md(analysis_results)
 
-        # 6. Generate contribution activity graph (placeholder)
+        # 6. Generate contribution activity graph
         contribution_activity_md = analyzer.generate_contribution_activity_md()
 
         # 7. Generate the full README content
-        readme_content = analyzer.generate_profile_readme(ranking, user_stats, tech_stack_md, contribution_activity_md)
+        readme_content = analyzer.generate_profile_readme(ranking, user_stats, project_showcase_md, contribution_activity_md)
 
-        # 7. Write to file
+        # 8. Write to file and save cache
         with open("PROFILE_README.md", "w", encoding="utf-8") as f:
             f.write(readme_content)
+
+        analyzer.save_ai_cache()
 
         print("\n✅ Successfully generated PROFILE_README.md")
         print(f"Total execution time: {time.time() - start_time:.2f} seconds")
