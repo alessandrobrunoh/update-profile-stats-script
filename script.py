@@ -668,40 +668,29 @@ class GitHubLanguageAnalyzer:
 
         return list(detected_tech)
 
-    def generate_project_showcase_md(self, analysis_results):
+    def generate_tech_stack_markdown(self, analysis_results):
         """
-        Generates a markdown showcase for the top projects with AI summaries.
+        Generates a categorized, text-based markdown for the tech stack.
         """
-        if not analysis_results:
+        detected_tech = self.detect_frameworks_from_repos(analysis_results)
+        if not detected_tech:
             return ""
 
-        markdown = "## 🚀 Project Showcase\n\n"
+        categories = {
+            "🎨 Frontend": ["react", "vue", "angular", "next.js", "nuxt.js", "gatsby", "svelte", "tailwind", "html", "css"],
+            "⚙️ Backend": ["django", "flask", "spring", "express", "laravel", "rubyonrails", "fastapi", "python", "java", "go", "rust", "php", "ruby"],
+            "☁️ DevOps & Cloud": ["docker", "kubernetes", "terraform", "ansible", "aws", "azure", "gcp", "jenkins", "github actions", "gitlab"],
+            "💾 Databases": ["mongodb", "postgresql", "mysql", "sqlite", "redis"],
+            "🧪 Testing": ["jest", "pytest", "junit", "mocha", "cypress", "selenium"],
+        }
 
-        # Select top 3 projects by total lines of code
-        sorted_repos = sorted(analysis_results, key=lambda x: x.get('total_lines', 0), reverse=True)
+        markdown = "## 💻 Tech Stack\n\n"
 
-        for repo_analysis in sorted_repos[:3]:
-            repo_name = repo_analysis['repo_name']
-
-            summary = self._ai_summarize_repository(repo_name)
-
-            languages = repo_analysis.get('languages', {})
-            detected_tech = self.detect_frameworks_from_repos([repo_analysis])
-
-            markdown += f"### [{repo_name}](https://github.com/{self.username}/{repo_name})\n"
-            markdown += f"*{summary}*\n\n"
-
-            markdown += "<p>"
-            for lang in languages:
-                badge = self._format_tech_badge(lang, self._get_language_logo(lang))
-                markdown += f"{badge} "
-
-            for tech_key in detected_tech:
-                if tech_key in self.tech_stack_mapping:
-                    display_name, icon_name = self.tech_stack_mapping[tech_key]
-                    badge = self._format_tech_badge(display_name, icon_name)
-                    markdown += f"{badge} "
-            markdown += "</p>\n\n"
+        for category, tech_keys in categories.items():
+            category_techs = [self.tech_stack_mapping[tech][0] for tech in detected_tech if tech in tech_keys]
+            if category_techs:
+                markdown += f"**{category}**: "
+                markdown += ", ".join(sorted(category_techs)) + "\n"
 
         return markdown
 
