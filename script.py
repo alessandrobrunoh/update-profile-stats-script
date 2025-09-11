@@ -206,7 +206,7 @@ class GitHubLanguageAnalyzer:
         print(f"Found {len(self.repositories)} non-forked repositories.")
         return self.repositories
 
-    def fetch_repository_languages(self, repo_name):
+    def fetch_repository_languages(self, repo_name, structure_analysis):
         """
         Fetches language data for a specific repository with generated code filtering.
         """
@@ -227,14 +227,14 @@ class GitHubLanguageAnalyzer:
 
             # If enabled, check for generated code and adjust language stats
             if self.config.get("github", {}).get("exclude_generated_code", True):
-                filtered_languages = self._filter_generated_code_languages(repo_name, filtered_languages)
+                filtered_languages = self._filter_generated_code_languages(repo_name, filtered_languages, structure_analysis)
 
             return filtered_languages
         except Exception as e:
             print(f"Warning: Could not fetch languages for {repo_name}: {e}")
             return {}
 
-    def _filter_generated_code_languages(self, repo_name, languages):
+    def _filter_generated_code_languages(self, repo_name, languages, repo_structure):
         """
         Analyzes repository structure and filters out generated code from language stats.
         """
@@ -244,8 +244,7 @@ class GitHubLanguageAnalyzer:
                 print(f"Warning: Cannot filter generated code for invalid repository name")
                 return languages
 
-            # Get repository structure
-            repo_structure = self.analyze_repository_structure(repo_name)
+            # Get repository structure is now passed in
             generated_patterns = self.config.get("exclusions", {}).get("generated_code_patterns", [])
             framework_files = self.config.get("exclusions", {}).get("framework_generated_files", [])
 
@@ -923,14 +922,14 @@ class GitHubLanguageAnalyzer:
                 print(f"Skipping {repo_name} as it is private or inaccessible.")
                 continue
 
-            # Fetch languages first to get a sense of the repo
-            languages = self.fetch_repository_languages(repo_name)
+            # Analyze structure first
+            structure_analysis = self.analyze_repository_structure(repo_name)
+
+            # Fetch languages, passing in the analysis result
+            languages = self.fetch_repository_languages(repo_name, structure_analysis)
             if not languages:
                 print(f"Skipping {repo_name} as it has no detectable languages or is empty.")
                 continue
-
-            # Analyze structure and quality
-            structure_analysis = self.analyze_repository_structure(repo_name)
 
             # Combine results
             combined_analysis = {
@@ -972,7 +971,7 @@ class GitHubLanguageAnalyzer:
 
         # Collect metrics for each language
         for result in analysis_results:
-            repo_name = result.get("repository", "")
+            repo_name = result.get("repo_name", "")
 
             # Skip if repository name is invalid
             if not repo_name or not repo_name.strip():
