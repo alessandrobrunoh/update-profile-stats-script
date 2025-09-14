@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile Stats Auto-Updater</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">📊</span>
+                <span class="brand-text">GitHub Stats</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#demo" class="nav-link">Demo</a>
+                <a href="#setup" class="nav-link">Setup</a>
+                <a href="https://github.com/alessandrobrunoh/update-profile-stats-script" class="nav-link-cta" target="_blank">
+                    Get Started
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Transform Your GitHub Profile with
+                    <span class="gradient-text">AI-Powered Statistics</span>
+                </h1>
+                <p class="hero-description">
+                    Automatically generate beautiful, data-driven profile statistics that update daily. 
+                    Showcase your coding skills with professional visualizations powered by AI analysis.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#setup" class="btn btn-primary">
+                        <span>Start Free Setup</span>
+                        <span class="btn-icon">→</span>
+                    </a>
+                    <a href="#demo" class="btn btn-secondary">
+                        <span>View Demo</span>
+                        <span class="btn-icon">👁️</span>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">5 min</span>
+                        <span class="stat-label">Setup Time</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">Daily</span>
+                        <span class="stat-label">Auto Updates</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">AI</span>
+                        <span class="stat-label">Powered</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="code-preview">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="code-title">README.md</span>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-line">
+                            <span class="code-comment"># 👋 Hi, I'm Alessandro!</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-text">## 🔥 Programming Language Rankings</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-keyword">🥇 Java</span> <span class="code-string">- 54.6% proficiency</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-progress">██████████░░░░░░░░░░</span> <span class="code-text">Quality: 5.3/10</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-keyword">🥈 TypeScript</span> <span class="code-string">- 53.7% proficiency</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-progress">██████████░░░░░░░░░░</span> <span class="code-text">Quality: 5.5/10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-description">
+                    Everything you need to create an impressive GitHub profile
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI-Powered Analysis</h3>
+                    <p class="feature-description">
+                        Uses Google Gemini AI to analyze code quality, complexity, and maintainability across all your repositories.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Beautiful Visualizations</h3>
+                    <p class="feature-description">
+                        Generate professional charts, progress bars, and statistics that make your profile stand out.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">Automatic Updates</h3>
+                    <p class="feature-description">
+                        Runs daily via GitHub Actions to keep your profile current with your latest contributions.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Smart Proficiency</h3>
+                    <p class="feature-description">
+                        Calculates language proficiency based on commits, code quality, and repository diversity.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure & Private</h3>
+                    <p class="feature-description">
+                        All processing happens in GitHub Actions. Your code never leaves GitHub's secure environment.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3 class="feature-title">Highly Customizable</h3>
+                    <p class="feature-description">
+                        Configure exclusions, styling, update frequency, and more through simple configuration files.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-description">
+                    Here's what your generated profile will look like
+                </p>
+            </div>
+            <div class="demo-container">
+                <div class="demo-preview">
+                    <div class="demo-header">
+                        <div class="demo-avatar">AB</div>
+                        <div class="demo-info">
+                            <h3>Alessandro Bruno</h3>
+                            <p>@alessandrobrunoh</p>
+                        </div>
+                    </div>
+                    <div class="demo-content">
+                        <div class="demo-section">
+                            <h4>🔥 Programming Language Rankings</h4>
+                            <div class="language-item">
+                                <span class="rank">🥇</span>
+                                <span class="lang-name">Java</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 55%"></div>
+                                </div>
+                                <span class="percentage">54.6%</span>
+                            </div>
+                            <div class="language-item">
+                                <span class="rank">🥈</span>
+                                <span class="lang-name">TypeScript</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 54%"></div>
+                                </div>
+                                <span class="percentage">53.7%</span>
+                            </div>
+                            <div class="language-item">
+                                <span class="rank">🥉</span>
+                                <span class="lang-name">Rust</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 47%"></div>
+                                </div>
+                                <span class="percentage">47.2%</span>
+                            </div>
+                        </div>
+                        <div class="demo-section">
+                            <h4>📊 User Statistics</h4>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <span class="stat-value">600</span>
+                                    <span class="stat-name">Total Commits</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">24</span>
+                                    <span class="stat-name">Repositories</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value">48</span>
+                                    <span class="stat-name">Stars Gained</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup Section -->
+    <section id="setup" class="setup">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Quick Setup Guide</h2>
+                <p class="section-description">
+                    Get started in just 5 minutes with these simple steps
+                </p>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Copy Workflow File</h3>
+                        <p class="step-description">
+                            Create <code>.github/workflows/update-stats.yml</code> in your profile repository and copy our workflow configuration.
+                        </p>
+                        <div class="code-snippet">
+                            <code>mkdir -p .github/workflows<br>curl -o .github/workflows/update-stats.yml https://raw.githubusercontent.com/alessandrobrunoh/update-profile-stats-script/main/example-workflow-for-users.yml</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Add API Keys</h3>
+                        <p class="step-description">
+                            Go to your repository Settings → Secrets and add your GitHub token and Gemini API key.
+                        </p>
+                        <div class="api-keys">
+                            <div class="api-key">
+                                <strong>GITHUB_TOKEN</strong>
+                                <span>Personal Access Token with repo permissions</span>
+                            </div>
+                            <div class="api-key">
+                                <strong>GEMINI_API_KEY</strong>
+                                <span>Google AI Studio API key for analysis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Run & Enjoy</h3>
+                        <p class="step-description">
+                            Commit the workflow file and watch as your profile gets automatically updated with beautiful statistics!
+                        </p>
+                        <div class="benefits">
+                            <span class="benefit">✅ Automatic daily updates</span>
+                            <span class="benefit">✅ Professional visualizations</span>
+                            <span class="benefit">✅ AI-powered insights</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Transform Your Profile?</h2>
+                <p class="cta-description">
+                    Join developers who are showcasing their skills with professional, AI-powered GitHub profiles.
+                </p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/alessandrobrunoh/update-profile-stats-script" class="btn btn-primary btn-large" target="_blank">
+                        <span>Get Started Now</span>
+                        <span class="btn-icon">🚀</span>
+                    </a>
+                    <a href="https://github.com/alessandrobrunoh" class="btn btn-secondary btn-large" target="_blank">
+                        <span>View Example</span>
+                        <span class="btn-icon">👀</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="brand-icon">📊</span>
+                    <span class="brand-text">GitHub Stats Auto-Updater</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/alessandrobrunoh/update-profile-stats-script" target="_blank">GitHub</a>
+                    <a href="https://github.com/alessandrobrunoh/update-profile-stats-script/issues" target="_blank">Support</a>
+                    <a href="https://github.com/alessandrobrunoh" target="_blank">Creator</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Made with ❤️ by <a href="https://github.com/alessandrobrunoh" target="_blank">@alessandrobrunoh</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
