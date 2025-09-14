@@ -43,3 +43,4 @@ test_*.py
 
 # Demo files
 *_demo.py
+.env
